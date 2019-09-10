@@ -20,7 +20,7 @@ function Header() {
           3. Enter county close to where you live or work.
         </p>
         <p className="StaticTextPara">
-          4. Echoose the city to where you live or work.
+          4. Choose the city to where you live or work.
         </p>        
         <p className="StaticTextPara">
           If you want to look for specialty provider who speak your language, expand the Additional Search

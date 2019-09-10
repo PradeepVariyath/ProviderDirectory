@@ -2,7 +2,7 @@ import React from "react";
 import SearchCriteria from "./component/layout/searchCriteria"
 
 //import './App.scss';
-import "./App.css";
+//import "./App.css";
 
 function App() {
   
@@ -16,5 +16,4 @@ function App() {
     </form>
   );
 }
-/*Added comment */
 export default App;

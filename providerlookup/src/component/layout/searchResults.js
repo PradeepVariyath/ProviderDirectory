@@ -1,10 +1,6 @@
 import React from "react";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-//import "./ReactTable.css";
-// import withFixedColumns from "react-table-hoc-fixed-columns";
-// import "react-table-hoc-fixed-columns/lib/styles.css";
-//import "./App.css";
 
 function SearchResults(props) {
   const providerDisplay = props.providerDisplay;
@@ -12,18 +8,11 @@ function SearchResults(props) {
   const HeaderClassName = props.headerClassName;
   const showPagination = props.showPagination;
   const reactTableCell = props.reactTableCell;
-  // const ReactTableFixedColumns = withFixedColumns(ReactTable);
-  //alert(spanClassName);
-  //console.log(providerDisplay);
-  //prov_addr_email
-  //https://dawsonwalker.me/blog/printing-page-hack
 
   const TheadComponent = props => null;
   const columns = [
     {
       Header: "Provider",
-      // HeaderStyle: {fontweight:'bold'},
-
       fixed: "left",
       style: { "white-space": "unset" },
       Cell: row => {
@@ -70,8 +59,7 @@ function SearchResults(props) {
             <span class="bluebold">Accepting new Patients: </span>
             <span
               style={{
-                color:
-                row.original.prov_new_patient === "Yes" ? "Green" : "Red"
+                color: row.original.prov_new_patient === "Yes" ? "Green" : "Red"
               }}
             >
               {row.original.prov_new_patient}
@@ -82,7 +70,6 @@ function SearchResults(props) {
     },
     {
       Header: "DHCP/PCP",
-      //headerClassName: "reactTableHeader",
       accessor: "",
       fixed: "right",
       className: "ReactColumn",
@@ -102,9 +89,7 @@ function SearchResults(props) {
   return (
     <div>
       <ReactTable
-        data={providerDisplay}
-        //TheadComponent={TheadComponent}
-        //headerClassName={headerClassName}
+        data={providerDisplay}        
         style
         columns={columns}
         minRows={0}

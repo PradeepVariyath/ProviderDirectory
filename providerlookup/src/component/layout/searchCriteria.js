@@ -5,7 +5,8 @@ import TextBoxControl from "../controls/textBoxControl";
 import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
 import Header from "./header";
-import Select from "react-select";
+import Button from 'react-bootstrap/es/Button';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 function SearchCritirea() {
   const [providerName, setProviderName] = useState(
@@ -92,8 +93,10 @@ function SearchCritirea() {
   const fetchSearchData = async () => {
     SetVisibleSearchResult(false);
     setProviderDisplay(initialSearchValue);
+
+  //  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     let url =
-      "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName;
     console.log(specialtySelected);
     if (specialtySelected === "0") {
@@ -117,9 +120,8 @@ function SearchCritirea() {
       } else {
         setErrorMessage("No Matching Records Found.");
         SetVisibleSearchResult(false);
-      }    
+      }
       setProviderDisplay(result.data);
-    
     } catch (error) {
       setErrorMessage("Error Fetching data.");
     }
@@ -131,7 +133,9 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-        "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+          //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+        "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
       console.log(result);
       setAllSpecialtys(result.data.SpecialityList);
@@ -170,16 +174,19 @@ function SearchCritirea() {
   return (
     <React.Fragment>
       {visibleSearchResult === false ? <Header /> : <p></p>}
+      <form class="form-horizontal"></form>
       <div className="mainFont">
         {" "}
         <TitleBar labelText="Enter Search Criteria" className="titleText" />
-        <TextBoxControl
+        <label for="usr">Enter Provider Name : </label>
+        <input type="text" class="form-control" id="usr"/>
+        {/* <TextBoxControl
           id="ct0"
           placeHolder="Enter Provider Name"
           labelText="Provider Name: "
           Value={providerName}
           onChange={onProvideChange}
-        />
+        /> */}
         <DropDownSelector
           value={specialtySelected}
           labelText="Specialty: "
@@ -203,32 +210,13 @@ function SearchCritirea() {
         />
         <TitleBar labelText="&nbsp;" className="titleText" />
       </div>
-
-      <div className="btnContainer">
-        <button
-          type="Submit"
-          name="btnSearch"
-          id="btnSearch"
-          onClick={onSearchBtnClick}
-        >
-          Search
-        </button>
-        <button
-          type="Submit"
-          name="btnReset"
-          id="btnReset"
-          onClick={onResetClick}
-        >
-          {" "}
-          Reset{" "}
-        </button>
+      
+      <div >
+      <Button class="btn btn-success"  onClick={onSearchBtnClick}  >Search</Button><span>{" "}</span>
+      <Button class="btn btn-success"  onClick={onResetClick}  >Reset</Button> <span>{" "}</span>      
         {visibleSearchResult ? (
-          <button type="Submit" onClick={printOrder}>
-            Print Me
-          </button>
-        ) : (
-          <p></p>
-        )}
+            <Button class="btn btn-success"  onClick={printOrder}  >Print</Button>        
+        ) :null}
       </div>
       <div>
         {visibleSearchResult ? (
