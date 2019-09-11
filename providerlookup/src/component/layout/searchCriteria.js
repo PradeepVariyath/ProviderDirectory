@@ -4,22 +4,25 @@ import TitleBar from "../controls/titlebar";
 import TextBoxControl from "../controls/textBoxControl";
 import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
+import SearchResults1 from "./SearchResults1";
 import Header from "./header";
-import Button from 'react-bootstrap/es/Button';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import Select from "react-select";
+//import  Button  from "react-bootstrap/es/Button";
+import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 function SearchCritirea() {
   const [providerName, setProviderName] = useState(
-    "ALABAMA ALLERGY & ASTHMA CLINIC"
+   //  "ALABAMA ALLERGY & ASTHMA CLINIC"
+   "BACHA"
   );
-  const initialSpecialtyValue = [
-    { value: "0", label: " --- Select A Specialty --- " }
-  ];
+  const initialSpecialtyValue = [{ value: "0", label: "Select a Specialty" }];
 
   const [specialtySelected, setSpecialtySelected] = useState(
     initialSpecialtyValue[0].value
   );
-  const [allSpecialtys, setAllSpecialtys] = useState(initialSpecialtyValue);
+  const [allSpecialtys, setAllSpecialtys] = useState([initialSpecialtyValue]);
 
   const initialCountyValue = [
     { value: "0", label: " --- Select A County --- " }
@@ -28,7 +31,7 @@ function SearchCritirea() {
   const [countySelected, setCountySelected] = useState(
     initialCountyValue[0].value
   );
-  const [city, setCity] = useState("MONTGOMERY");
+  const [city, setCity] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
   const initialSearchValue = [{}];
@@ -40,6 +43,8 @@ function SearchCritirea() {
   useEffect(() => {
     fetchInitialData();
     SetVisibleSearchResult(false);
+    // console.log( allSpecialtys);
+    // allSpecialtys.unshift(initialSpecialtyValue);
   }, []);
 
   const onProvideChange = event => {
@@ -50,10 +55,6 @@ function SearchCritirea() {
     const value = event.target.value.toUpperCase();
     setCity(value);
   };
-  // const onQuickSearch = event => {
-  //   const value = event.target.value.toUpperCase();
-  //   SetQuickSearch(value);
-  // };
 
   const onSpecialtySelection = event => {
     const value = event.target.value;
@@ -94,12 +95,13 @@ function SearchCritirea() {
     SetVisibleSearchResult(false);
     setProviderDisplay(initialSearchValue);
 
-  //  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    //  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     let url =
       "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName;
-    console.log(specialtySelected);
+
     if (specialtySelected === "0") {
+      // console('true');
       url = url + "&specialty_code=";
     } else {
       url = url + "&specialty_code=" + specialtySelected;
@@ -133,13 +135,14 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-          //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
         "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
-      console.log(result);
+      //console.log(result);
       setAllSpecialtys(result.data.SpecialityList);
       setAllCounty(result.data.CountyList);
+     // setAllCounty(initialCountyValue);
     } catch (error) {
       setErrorMessage(
         "Error in Loading Specialty, County Information, Please contact Technical Support Team."
@@ -173,76 +176,97 @@ function SearchCritirea() {
 
   return (
     <React.Fragment>
-      {visibleSearchResult === false ? <Header /> : <p></p>}
-      <form class="form-horizontal"></form>
-      <div className="mainFont">
-        {" "}
-        <TitleBar labelText="Enter Search Criteria" className="titleText" />
-        <label for="usr">Enter Provider Name : </label>
-        <input type="text" class="form-control" id="usr"/>
-        {/* <TextBoxControl
-          id="ct0"
-          placeHolder="Enter Provider Name"
-          labelText="Provider Name: "
-          Value={providerName}
-          onChange={onProvideChange}
-        /> */}
-        <DropDownSelector
-          value={specialtySelected}
-          labelText="Specialty: "
-          defaultText="--- Select A Speciality ---"
-          options={allSpecialtys}
-          onChange={onSpecialtySelection}
-        />
-        <DropDownSelector
-          value={countySelected}
-          labelText="County: "
-          defaultText="--- Select A County ---"
-          options={allCounty}
-          onChange={onCountySelection}
-        />
-        <TextBoxControl
-          id="ct1"
-          labelText="City: "
-          placeHolder="Enter City Name"
-          Value={city}
-          onChange={onCityChange}
-        />
-        <TitleBar labelText="&nbsp;" className="titleText" />
-      </div>
-      
-      <div >
-      <Button class="btn btn-success"  onClick={onSearchBtnClick}  >Search</Button><span>{" "}</span>
-      <Button class="btn btn-success"  onClick={onResetClick}  >Reset</Button> <span>{" "}</span>      
-        {visibleSearchResult ? (
-            <Button class="btn btn-success"  onClick={printOrder}  >Print</Button>        
-        ) :null}
-      </div>
-      <div>
-        {visibleSearchResult ? (
-          <div>
-            <SearchResults
-              providerDisplay={providerDisplay}
-              defaultPageSize={10}
-              showPagination={true}
-              ref={componentRef}
-              reactTableCell={"reactTableCell"}
-            />{" "}
-          </div>
-        ) : (
-          <p className="ErrorMessage">{errorMessage}</p>
-        )}
-      </div>
+      <form>
+        <div class="container-fluid">
+          <div class="row" style={{ backgroundColor: "#1e6bd6" }}>
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
+              One
+            </div>
+            <div
+              class="col-xs-8 col-sm-8 col-md-4 col-lg-8 "
+              style={{ backgroundColor: "white" }}
+            >
+              {visibleSearchResult === false ? <Header /> : <p></p>}
 
-      <div id="printme">
-        <SearchResults
-          providerDisplay={providerDisplay}
-          defaultPageSize={providerDisplay.Length}
-          showPagination={false}
-          ref={componentRef}
-          reactTableCell={"reactTableCellPrint"}
-        />
-      </div>
+              <div>
+                <TitleBar labelText="Enter Search Criteria" />
+                <br />
+                <TextBoxControl
+                  id="ct0"
+                  placeHolder="Enter Provider Name"
+                  labelText="Provider Name: "
+                  Value={providerName}
+                  onChange={onProvideChange}
+                />
+                <DropDownSelector
+                  value={specialtySelected}
+                  labelText="Specialty : "
+                  defaultText="--- Select A Speciality ---"
+                  options={allSpecialtys}
+                  onChange={onSpecialtySelection}
+                />
+                <DropDownSelector
+                  value={countySelected}
+                  labelText="County: "
+                  defaultText="--- Select A County ---"
+                  options={allCounty}
+                  onChange={onCountySelection}
+                />
+                <TextBoxControl
+                  id="ct1"
+                  labelText="City: "
+                  placeHolder="Enter City Name"
+                  Value={city}
+                  onChange={onCityChange}
+                />
+                <TitleBar labelText="&nbsp;" className="titleText" />
+              </div>
+              <br />
+              <div className="float-right">
+                <Button class="btn btn-success" onClick={onSearchBtnClick}>
+                  Search
+                </Button>
+                <span> </span>
+                <Button class="btn btn-success" onClick={onResetClick}>
+                  Reset
+                </Button>{" "}
+                <span> </span>
+                {visibleSearchResult ? (
+                  <Button class="btn btn-success" onClick={printOrder}>
+                    Print
+                  </Button>
+                ) : null}
+              </div>
+              <br />
+              <br />
+              <div>
+                {visibleSearchResult ? (
+                  <div>
+                    <SearchResults1   
+                    providerDisplay={providerDisplay}                  
+                    />{" "}
+                  </div>
+                ) : (
+                  <p className="ErrorMessage">{errorMessage}</p>
+                )}
+              </div>
+
+              <div class="d-none" id="printme">
+                <SearchResults
+                  providerDisplay={providerDisplay}
+                  defaultPageSize={providerDisplay.Length}
+                  showPagination={false}
+                  ref={componentRef}
+                  reactTableCell={"reactTableCellPrint"}
+                />
+              </div>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
+              Three
+            </div>
+          </div>
+        </div>      
+      </form>
     </React.Fragment>
   );
 }

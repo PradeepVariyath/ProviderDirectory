@@ -1,28 +1,19 @@
 import React from "react";
-//import "./styles.css";
-
-//https://www.robinwieruch.de/react-hooks-fetch-data/
-//https://codesandbox.io/s/98oj2q7ok4
 
 function TextBoxControl(props) {
   return (
-    <div className="contentBody">
-    <div className="contentField">
-      <label className="contentFieldLabel" id="lblStates">
-     { props.labelText}
-      </label>
-      <div className="contentFieldControl">
-        <div id={props.id}>
-          <input
-            type="search"           
-            placeHolder={props.placeHolder}
-            value={props.Value}
-            onChange={props.onChange}
-           style={{texttransform: "uppercase"}}
-          />
-        </div>
+    <div class="form-group row">
+      <label class="col-sm-2 control-label">{props.labelText}</label>
+      <div class="col-sm-6 col-lg-10">
+        <input
+          type="Search"
+          placeHolder={props.placeHolder}
+          value={props.Value}
+          onChange={props.onChange}
+          class="form-control"
+          style={{ texttransform: "uppercase" }}
+        />
       </div>
-    </div>
     </div>
   );
 }

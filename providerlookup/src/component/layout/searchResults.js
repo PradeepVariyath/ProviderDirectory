@@ -25,16 +25,16 @@ function SearchResults(props) {
             {row.original.prov_addr_mail_city},
             {row.original.prov_addr_mail_state} {row.original.prov_addr_zip}
             <br />
-            <span class="bluebold">County : </span>
+            <span>County : </span>
             <span>
               {" "}
-              <i>{row.original.prov_county}</i>
+              {row.original.prov_county}
               <br />
             </span>
-            <span class="bluebold">Phone : </span>
-            <a href="#">{row.original.prov_phone}</a>
+            <span>Phone : </span>
+            {row.original.prov_phone}
             <br />
-            <span class="bluebold">Email : {row.original.prov_addr_email}</span>
+            <span>Email : {row.original.prov_addr_email}</span>
           </div>
         );
       }
@@ -47,23 +47,17 @@ function SearchResults(props) {
       Cell: row => {
         return (
           <div className={reactTableCell}>
-            <span class="bluebold">Speciality:</span>
+            <span>Speciality:</span>
             {row.original.prov_specicialty}
             <br />
-            <span class="bluebold">
+            <span>
               Linguistic capabilities:
               {row.original.prov_lang_capabilities}
             </span>
             <br />
 
-            <span class="bluebold">Accepting new Patients: </span>
-            <span
-              style={{
-                color: row.original.prov_new_patient === "Yes" ? "Green" : "Red"
-              }}
-            >
-              {row.original.prov_new_patient}
-            </span>
+            <span>Accepting new Patients: </span>
+            <span>{row.original.prov_new_patient}</span>
           </div>
         );
       }
@@ -77,9 +71,9 @@ function SearchResults(props) {
       Cell: row => {
         return (
           <div className={reactTableCell}>
-            <span class="bluebold">DHCP: </span> {row.original.prov_dhcp}
+            <span>DHCP: </span> {row.original.prov_dhcp}
             <br />
-            <span class="bluebold">PCP: </span> {row.original.prov_pcp}
+            <span>PCP: </span> {row.original.prov_pcp}
           </div>
         );
       }
@@ -89,7 +83,7 @@ function SearchResults(props) {
   return (
     <div>
       <ReactTable
-        data={providerDisplay}        
+        data={providerDisplay}
         style
         columns={columns}
         minRows={0}
