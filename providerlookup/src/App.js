@@ -1,6 +1,9 @@
 import React from "react";
 import SearchCriteria from "./component/layout/searchCriteria"
 import "./App1.css";
+import { usePromiseTracker } from "react-promise-tracker";
+import Loader from 'react-loader-spinner';
+
 //import './App.scss';
 //import "./App.css";
 
