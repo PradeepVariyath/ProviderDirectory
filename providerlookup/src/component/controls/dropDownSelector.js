@@ -5,10 +5,10 @@ function DropDownSelector(props) {
   const { options } = props;
 
   return (
-    <div class="form-group row">
-      <label class="col-sm-2 control-label">{props.labelText}</label>
-      <div class="col-sm-6 col-lg-10">
-        <select onChange={onChange} value={props.value} class="form-control">
+    <div className="form-group row">
+      <label className="col-sm-2 control-label">{props.labelText}</label>
+      <div className="col-sm-6 col-lg-10">
+        <select onChange={onChange}   key={props.value} value={props.value} className="form-control">
           <option key="0" value="0">
             {props.defaultText}
           </option>

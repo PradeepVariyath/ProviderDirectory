@@ -2,15 +2,15 @@ import React from "react";
 
 function TextBoxControl(props) {
   return (
-    <div class="form-group row">
-      <label class="col-sm-2 control-label">{props.labelText}</label>
-      <div class="col-sm-6 col-lg-10">
+    <div className="form-group row">
+      <label className="col-sm-2 control-label">{props.labelText}</label>
+      <div className="col-sm-6 col-lg-10">
         <input
-          type="Search"
-          placeHolder={props.placeHolder}
+          type="search"
+          placeholder={props.placeholder}
           value={props.Value}
           onChange={props.onChange}
-          class="form-control"
+          className="form-control"
           style={{ texttransform: "uppercase" }}
         />
       </div>

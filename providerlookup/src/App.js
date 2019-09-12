@@ -1,21 +1,17 @@
 import React from "react";
-import SearchCriteria from "./component/layout/searchCriteria"
+import SearchCriteria from "./component/layout/searchCriteria";
+import LoadingIndicator from "./component/controls/loadingIndicator";
 import "./App1.css";
-import { usePromiseTracker } from "react-promise-tracker";
-import Loader from 'react-loader-spinner';
-
-//import './App.scss';
-//import "./App.css";
 
 function App() {
-  
   return (
-   <form>
-    <div id="AL_Container">
-      <div id="AL_Content"> 
-     
-      <SearchCriteria/>    
-      </div></div>
+    <form>
+      <div id="AL_Container">
+        <div id="AL_Content">
+          <SearchCriteria />
+          <LoadingIndicator />
+        </div>
+      </div>
     </form>
   );
 }

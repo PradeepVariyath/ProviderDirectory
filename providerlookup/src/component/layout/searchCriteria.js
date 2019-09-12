@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import TitleBar from "../controls/titlebar";
 import TextBoxControl from "../controls/textBoxControl";
 import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
-import SearchResults1 from "./SearchResults1";
 import Header from "./header";
-import Select from "react-select";
-//import  Button  from "react-bootstrap/es/Button";
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { trackPromise } from "react-promise-tracker";
 
 function SearchCritirea() {
   const [providerName, setProviderName] = useState(
-   //  "ALABAMA ALLERGY & ASTHMA CLINIC"
-   "BACHA"
+    // "ALABAMA ALLERGY & ASTHMA CLINIC"
+    "BACHA"
   );
   const initialSpecialtyValue = [{ value: "0", label: "Select a Specialty" }];
 
@@ -36,15 +33,10 @@ function SearchCritirea() {
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
   const initialSearchValue = [{}];
   const [providerDisplay, setProviderDisplay] = useState(initialSearchValue);
-  // const [providerDisplayLength, SetProviderDisplayLength] = useState("0");
-  // const [quicksearch, SetQuickSearch] = useState("");
-  // const [select2, SetSelect2] = useState(undefined);
 
   useEffect(() => {
     fetchInitialData();
     SetVisibleSearchResult(false);
-    // console.log( allSpecialtys);
-    // allSpecialtys.unshift(initialSpecialtyValue);
   }, []);
 
   const onProvideChange = event => {
@@ -87,7 +79,7 @@ function SearchCritirea() {
     ) {
       setErrorMessage("Please Enter alteast one search Criteria.");
     } else {
-      fetchSearchData();
+      trackPromise(fetchSearchData());
     }
   };
 
@@ -95,13 +87,12 @@ function SearchCritirea() {
     SetVisibleSearchResult(false);
     setProviderDisplay(initialSearchValue);
 
-     let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =
-    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    //let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url =
+      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName;
 
     if (specialtySelected === "0") {
-      // console('true');
       url = url + "&specialty_code=";
     } else {
       url = url + "&specialty_code=" + specialtySelected;
@@ -123,7 +114,7 @@ function SearchCritirea() {
         setErrorMessage("No Matching Records Found.");
         SetVisibleSearchResult(false);
       }
-      setProviderDisplay(result.data);
+      setProviderDisplay(result.data.providerDetails);
     } catch (error) {
       setErrorMessage("Error Fetching data.");
     }
@@ -135,14 +126,13 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-         "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        //   "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-      //  "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
-      //console.log(result);
+
       setAllSpecialtys(result.data.SpecialityList);
       setAllCounty(result.data.CountyList);
-     // setAllCounty(initialCountyValue);
     } catch (error) {
       setErrorMessage(
         "Error in Loading Specialty, County Information, Please contact Technical Support Team."
@@ -172,31 +162,30 @@ function SearchCritirea() {
     document.body.innerHTML = oldPage;
   };
 
-  const componentRef = useRef();
-
   return (
     <React.Fragment>
-      <form>
-        <div class="container-fluid">
-          <div class="row" style={{ backgroundColor: "#1e6bd6" }}>
-            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
-              One
+      <form onSubmit={onSearchBtnClick}>
+        <div className="container-fluid">
+          <div className="row" style={{ backgroundColor: "#1e6bd6" }}>
+            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
+              {/* One */}
             </div>
             <div
-              class="col-xs-8 col-sm-8 col-md-4 col-lg-8 "
+              className="col-xs-8 col-sm-8 col-md-4 col-lg-8 "
               style={{ backgroundColor: "white" }}
             >
               {visibleSearchResult === false ? <Header /> : <p></p>}
 
               <div>
-                <TitleBar labelText="Enter Search Criteria" />
+                <TitleBar labelText="&nbsp;Enter Search Criteria" />
                 <br />
                 <TextBoxControl
                   id="ct0"
-                  placeHolder="Enter Provider Name"
+                  placeholder="Enter Provider Name"
                   labelText="Provider Name: "
                   Value={providerName}
                   onChange={onProvideChange}
+                  autoFocus
                 />
                 <DropDownSelector
                   value={specialtySelected}
@@ -215,7 +204,7 @@ function SearchCritirea() {
                 <TextBoxControl
                   id="ct1"
                   labelText="City: "
-                  placeHolder="Enter City Name"
+                  placeholder="Enter City Name"
                   Value={city}
                   onChange={onCityChange}
                 />
@@ -223,16 +212,20 @@ function SearchCritirea() {
               </div>
               <br />
               <div className="float-right">
-                <Button class="btn btn-success" onClick={onSearchBtnClick}>
+                <Button
+                  type="Submit"
+                  className="btn btn-primary"
+                  onClick={onSearchBtnClick}
+                >
                   Search
                 </Button>
                 <span> </span>
-                <Button class="btn btn-success" onClick={onResetClick}>
+                <Button  type="Button" className="btn btn-primary" onClick={onResetClick}>
                   Reset
                 </Button>{" "}
                 <span> </span>
                 {visibleSearchResult ? (
-                  <Button class="btn btn-success" onClick={printOrder}>
+                  <Button type="Button" className="btn btn-primary" onClick={printOrder}>
                     Print
                   </Button>
                 ) : null}
@@ -242,30 +235,27 @@ function SearchCritirea() {
               <div>
                 {visibleSearchResult ? (
                   <div>
-                    <SearchResults1   
-                    providerDisplay={providerDisplay}                  
-                    />{" "}
+                    <SearchResults
+                      providerDisplay={providerDisplay}
+                      showPagination={true}
+                    />
                   </div>
                 ) : (
                   <p className="ErrorMessage">{errorMessage}</p>
                 )}
               </div>
 
-              <div class="d-none" id="printme">
+              <div className="d-none" id="printme">
                 <SearchResults
+                  id="id2"
                   providerDisplay={providerDisplay}
-                  defaultPageSize={providerDisplay.Length}
                   showPagination={false}
-                  ref={componentRef}
-                  reactTableCell={"reactTableCellPrint"}
                 />
               </div>
             </div>
-            <div class="col-sm-2 col-md-2 col-lg-2">
-              Three
-            </div>
+            <div className="col-sm-2 col-md-2 col-lg-2">{/* Three */}</div>
           </div>
-        </div>      
+        </div>
       </form>
     </React.Fragment>
   );
