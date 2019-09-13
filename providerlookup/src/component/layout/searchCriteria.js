@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TitleBar from "../controls/titlebar";
+import TextBarControl from "../controls/textBar";
 import TextBoxControl from "../controls/textBoxControl";
 import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
@@ -31,6 +31,8 @@ function SearchCritirea() {
   const [city, setCity] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
+  const [visibleHeaderText, SetVisibleHeaderText] = useState(true);
+
   const initialSearchValue = [{}];
   const [providerDisplay, setProviderDisplay] = useState(initialSearchValue);
 
@@ -79,6 +81,10 @@ function SearchCritirea() {
     ) {
       setErrorMessage("Please Enter alteast one search Criteria.");
     } else {
+      setErrorMessage("");
+      //no need to show the header text .
+      SetVisibleHeaderText(false);
+
       trackPromise(fetchSearchData());
     }
   };
@@ -147,6 +153,7 @@ function SearchCritirea() {
     setCity("");
     setErrorMessage("");
     SetVisibleSearchResult(false);
+    SetVisibleHeaderText(true);
     event.preventDefault();
   };
 
@@ -166,18 +173,18 @@ function SearchCritirea() {
     <React.Fragment>
       <form onSubmit={onSearchBtnClick}>
         <div className="container-fluid">
-          <div className="row" style={{ backgroundColor: "#1e6bd6" }}>
+          <div className="row">
             <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
               {/* One */}
             </div>
-            <div
-              className="col-xs-8 col-sm-8 col-md-4 col-lg-8 "
-              style={{ backgroundColor: "white" }}
-            >
-              {visibleSearchResult === false ? <Header /> : <p></p>}
+            <div className="col-xs-8 col-sm-8 col-md-4 col-lg-8 ">
+              {visibleHeaderText? <Header /> : null}
 
               <div>
-                <TitleBar labelText="&nbsp;Enter Search Criteria" />
+                <TextBarControl
+                  labelText="Enter Search Criteria"
+                  controlType="titleBar"
+                />
                 <br />
                 <TextBoxControl
                   id="ct0"
@@ -208,7 +215,7 @@ function SearchCritirea() {
                   Value={city}
                   onChange={onCityChange}
                 />
-                <TitleBar labelText="&nbsp;" className="titleText" />
+                <TextBarControl labelText="&nbsp;" controlType="titleBar" />
               </div>
               <br />
               <div className="float-right">
@@ -220,12 +227,20 @@ function SearchCritirea() {
                   Search
                 </Button>
                 <span> </span>
-                <Button  type="Button" className="btn btn-primary" onClick={onResetClick}>
+                <Button
+                  type="Button"
+                  className="btn btn-primary"
+                  onClick={onResetClick}
+                >
                   Reset
                 </Button>{" "}
                 <span> </span>
                 {visibleSearchResult ? (
-                  <Button type="Button" className="btn btn-primary" onClick={printOrder}>
+                  <Button
+                    type="Button"
+                    className="btn btn-primary"
+                    onClick={printOrder}
+                  >
                     Print
                   </Button>
                 ) : null}
@@ -236,18 +251,22 @@ function SearchCritirea() {
                 {visibleSearchResult ? (
                   <div>
                     <SearchResults
+ id="sr1"
                       providerDisplay={providerDisplay}
                       showPagination={true}
                     />
                   </div>
                 ) : (
-                  <p className="ErrorMessage">{errorMessage}</p>
+                  <TextBarControl
+                    labelText={errorMessage}
+                    controlType="errorMessage"
+                  />
                 )}
               </div>
 
               <div className="d-none" id="printme">
                 <SearchResults
-                  id="id2"
+                  id="sr2"
                   providerDisplay={providerDisplay}
                   showPagination={false}
                 />
