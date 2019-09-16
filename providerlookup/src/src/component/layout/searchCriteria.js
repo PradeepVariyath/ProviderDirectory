@@ -10,86 +10,75 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { trackPromise } from "react-promise-tracker";
 
 function SearchCritirea() {
-  //States  the ProviderName, Specialty, County, City
-  const [providerName, SetProviderName] = useState("");
+  const [providerName, setProviderName] = useState("BACHA");
+  const initialSpecialtyValue = [{ value: "0", label: "Select a Specialty" }];
 
-  const [specialtys, SetSpecialtys] = useState([]);
-  const [specialtySelected, SetSpecialtySelected] = useState();
+  const [specialtySelected, setSpecialtySelected] = useState(
+    initialSpecialtyValue[0].value
+  );
+  const [allSpecialtys, setAllSpecialtys] = useState([initialSpecialtyValue]);
 
-  const [county, SetCounty] = useState([]);
-  const [countySelected, SetCountySelected] = useState();
-
-  const [city, SetCity] = useState("");
-
-  //states for the visibility for the header text, Search Result.
+  const initialCountyValue = [
+    { value: "0", label: " --- Select A County --- " }
+  ];
+  const [allCounty, setAllCounty] = useState(initialCountyValue);
+  const [countySelected, setCountySelected] = useState(
+    initialCountyValue[0].value
+  );
+  const [city, setCity] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
   const [visibleHeaderText, SetVisibleHeaderText] = useState(true);
 
-  //State for the Search Results.
-  const [providerDisplay, SetProviderDisplay] = useState([]);
-  //State for Error Message.
-  const [errorMessage, SetErrorMessage] = useState("");
+  const initialSearchValue = [{}];
+  const [providerDisplay, setProviderDisplay] = useState(initialSearchValue);
 
-  //Initialize the drop downs and set Results display to false.
   useEffect(() => {
     fetchInitialData();
     SetVisibleSearchResult(false);
   }, []);
 
-  const fetchInitialData = async () => {
-    try {
-      const result = await axios(
-        "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-      );
-
-      SetSpecialtys(result.data.SpecialityList);
-      SetCounty(result.data.CountyList);
-    } catch (error) {
-      SetErrorMessage(
-        "Error in Loading Specialty, County Information, Please contact Technical Support Team."
-      );
-    }
-  };
-  //on Provider Name Text box change.
   const onProvideChange = event => {
     const value = event.target.value.toUpperCase();
-    SetProviderName(value);
+    setProviderName(value);
   };
-  //on City Text box change.
   const onCityChange = event => {
     const value = event.target.value.toUpperCase();
-    SetCity(value);
+    setCity(value);
   };
-  //On Specialty dropdown Selection.
+
   const onSpecialtySelection = event => {
-    let specialtyIndex = specialtys.filter(
-      state => state.value === event.target.value
-    );
-    SetSpecialtySelected(specialtyIndex[0].value);
+    const value = event.target.value;
+
+    if (value === "0") {
+      setSpecialtySelected(initialSpecialtyValue[0].value);
+    } else {
+      let specialtyIndex = allSpecialtys.filter(state => state.value === value);
+      setSpecialtySelected(specialtyIndex[0].value);
+    }
   };
-  //On County Dropdown selection.
+
   const onCountySelection = event => {
-    let countyIndex = county.filter(
-      state => state.value === event.target.value
-    );
-    SetCountySelected(countyIndex[0].value);
+    const value = event.target.value;
+    if (value === "0") {
+      setCountySelected(initialCountyValue[0].value);
+    } else {
+      const countyIndex = allCounty.filter(state => state.value === value);
+      setCountySelected(countyIndex[0].value);
+    }
   };
 
   const onSearchBtnClick = event => {
     event.preventDefault();
-    console.log(
-      "providerName.trim()" + providerName.trim() + "providerName.trim()"
-    );
     if (
       providerName.trim() === "" &&
       city.trim() === "" &&
       countySelected === "0" &&
       specialtySelected === "0"
     ) {
-      SetErrorMessage("Please Enter alteast one search Criteria.");
+      setErrorMessage("Please Enter alteast one search Criteria.");
     } else {
-      SetErrorMessage("");
+      setErrorMessage("");
       //no need to show the header text .
       SetVisibleHeaderText(false);
 
@@ -99,53 +88,73 @@ function SearchCritirea() {
 
   const fetchSearchData = async () => {
     SetVisibleSearchResult(false);
-    SetProviderDisplay([]);
+    setProviderDisplay(initialSearchValue);
 
+    //let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     let url =
-      "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =
-    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+      "http://localhost/AlportalAlt/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
 
-    if (specialtySelected === undefined || specialtySelected === "0") {
+    if (specialtySelected === "0") {
       url = url + "&specialty_code=";
     } else {
       url = url + "&specialty_code=" + specialtySelected;
     }
 
-    if (countySelected === undefined || countySelected === "0") {
+    if (countySelected === "0") {
       url = url + "&county=";
     } else {
       url = url + "&county=" + countySelected;
     }
     url = url + "&city=" + city.trim();
-    //console.log(url);
-
+    console.log(url);
+    
     try {
+     
       const result = await axios(url);
-
+      console.log('test');
+     // console.log("result.data.length " + result.data.providerDetails.length);
+     /*
       if (result.data.providerDetails.length !== 0) {
         SetVisibleSearchResult(true);
       } else {
-        SetErrorMessage("No Matching Records Found.");
+        setErrorMessage("No Matching Records Found.");
         SetVisibleSearchResult(false);
       }
-
-      SetProviderDisplay(result.data.providerDetails);
+      */
+      setProviderDisplay(result.data.providerDetails);
     } catch (error) {
-      SetErrorMessage("Error Fetching data.");
+      console.log(error);
+      setErrorMessage("Error Fetching data.");
     }
   };
 
   //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
   //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
+  const fetchInitialData = async () => {
+    try {
+      const result = await axios(
+        //   "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+        "http://localhost/AlportalAlt/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+      );
+
+      setAllSpecialtys(result.data.SpecialityList);
+      setAllCounty(result.data.CountyList);
+    } catch (error) {
+      setErrorMessage(
+        "Error in Loading Specialty, County Information, Please contact Technical Support Team."
+      );
+    }
+  };
+
   const onResetClick = event => {
-    SetProviderName("");
-    SetSpecialtySelected("0");
-    SetCountySelected("0");
-    SetCity("");
-    SetErrorMessage("");
+    setProviderName("");
+    setSpecialtySelected("0");
+    setCountySelected("0");
+    setCity("");
+    setErrorMessage("");
     SetVisibleSearchResult(false);
     SetVisibleHeaderText(true);
     event.preventDefault();
@@ -192,14 +201,14 @@ function SearchCritirea() {
                   value={specialtySelected}
                   labelText="Specialty : "
                   defaultText="--- Select A Speciality ---"
-                  options={specialtys}
+                  options={allSpecialtys}
                   onChange={onSpecialtySelection}
                 />
                 <DropDownSelector
                   value={countySelected}
                   labelText="County: "
                   defaultText="--- Select A County ---"
-                  options={county}
+                  options={allCounty}
                   onChange={onCountySelection}
                 />
                 <TextBoxControl
