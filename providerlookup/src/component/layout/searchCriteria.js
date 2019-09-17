@@ -10,37 +10,121 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { trackPromise } from "react-promise-tracker";
 
 function SearchCritirea() {
-  //States  the ProviderName, Specialty, County, City
+  //Set the States for initializing the search controls
   const [providerName, SetProviderName] = useState("");
-
-  const [specialtys, SetSpecialtys] = useState([]);
-  const [specialtySelected, SetSpecialtySelected] = useState();
-
-  const [county, SetCounty] = useState([]);
-  const [countySelected, SetCountySelected] = useState();
-
   const [city, SetCity] = useState("");
 
-  //states for the visibility for the header text, Search Result.
+  const initialSpecialtyValue = [{ value: "0", label: "Select a Specialty" }];
+  const [specialtySelected, SetSpecialtySelected] = useState(
+    initialSpecialtyValue[0].value
+  );
+  const [specialtys, SetSpecialtys] = useState([initialSpecialtyValue]);
+
+  const initialCountyValue = [
+    { value: "0", label: " --- Select A County --- " }
+  ];
+  const [county, SetCounty] = useState(initialCountyValue);
+  const [countySelected, SetCountySelected] = useState(
+    initialCountyValue[0].value
+  );
+  //Set Error Message
+  const [errorMessage, SetErrorMessage] = useState("");
+  //Set visibility for Header text and Search Result table
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
   const [visibleHeaderText, SetVisibleHeaderText] = useState(true);
+  //Data Fetched on Search button click
+  const initialSearchValue = [{}];
+  const [providerDisplay, SetProviderDisplay] = useState(initialSearchValue);
 
-  //State for the Search Results.
-  const [providerDisplay, SetProviderDisplay] = useState([]);
-  //State for Error Message.
-  const [errorMessage, SetErrorMessage] = useState("");
-
-  //Initialize the drop downs and set Results display to false.
   useEffect(() => {
     fetchInitialData();
-    SetVisibleSearchResult(false);
   }, []);
+
+  const onProvideChange = event => {
+    SetProviderName(event.target.value.toUpperCase());
+  };
+  const onCityChange = event => {
+    SetCity(event.target.value.toUpperCase());
+  };
+
+  const onSpecialtySelection = event => {
+    const value = event.target.value;
+
+    let specialtyIndex = specialtys.filter(state => state.value === value);
+    SetSpecialtySelected(specialtyIndex[0].value);
+  };
+
+  const onCountySelection = event => {
+    const value = event.target.value;
+
+    const countyIndex = county.filter(state => state.value === value);
+    SetCountySelected(countyIndex[0].value);
+  };
+
+  const onSearchBtnClick = event => {
+    event.preventDefault();
+    //no need to show the header text .
+    SetVisibleHeaderText(false);
+    //Set the Search Result Visible false
+    SetVisibleSearchResult(false);
+    if (
+      providerName.trim() === "" &&
+      city.trim() === "" &&
+      countySelected === "0" &&
+      specialtySelected === "0"
+    ) {
+      SetErrorMessage("Please Enter alteast one search Criteria.");
+    } else {
+      SetErrorMessage("");
+      trackPromise(fetchSearchData());
+    }
+  };
+
+  const fetchSearchData = async () => {
+   
+    SetProviderDisplay(initialSearchValue);
+
+   let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    // let url =
+    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    url = url + "provider=" + providerName.trim();
+    url =
+      specialtySelected === "0"
+        ? url + "&specialty_code="
+        : url + "&specialty_code=" + specialtySelected;
+
+    url =
+      countySelected === "0"
+        ? url + "&county="
+        : url + "&county=" + countySelected;
+
+    url = url + "&city=" + city.trim();
+    console.log(url);
+    try {
+      const result = await axios(url);
+
+      //if Length > 0 Set the output otherwise Set error Message
+      if (result.data.providerDetails.length > 0) {
+        SetVisibleSearchResult(true);
+        SetProviderDisplay(result.data.providerDetails);
+      } else {
+        SetErrorMessage("No Matching Records Found.");
+        SetVisibleSearchResult(false);
+      }
+    } catch (error) {
+      SetErrorMessage("Error Fetching data.");
+    }
+  };
+
+  //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
+  //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-        "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+          "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+      //  "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
@@ -51,96 +135,9 @@ function SearchCritirea() {
       );
     }
   };
-  //on Provider Name Text box change.
-  const onProvideChange = event => {
-    const value = event.target.value.toUpperCase();
-    SetProviderName(value);
-  };
-  //on City Text box change.
-  const onCityChange = event => {
-    const value = event.target.value.toUpperCase();
-    SetCity(value);
-  };
-  //On Specialty dropdown Selection.
-  const onSpecialtySelection = event => {
-    let specialtyIndex = specialtys.filter(
-      state => state.value === event.target.value
-    );
-    SetSpecialtySelected(specialtyIndex[0].value);
-  };
-  //On County Dropdown selection.
-  const onCountySelection = event => {
-    let countyIndex = county.filter(
-      state => state.value === event.target.value
-    );
-    SetCountySelected(countyIndex[0].value);
-  };
-
-  const onSearchBtnClick = event => {
-    event.preventDefault();
-    console.log(
-      "providerName.trim()" + providerName.trim() + "providerName.trim()"
-    );
-    if (
-      providerName.trim() === "" &&
-      city.trim() === "" &&
-      countySelected === "0" &&
-      specialtySelected === "0"
-    ) {
-      SetErrorMessage("Please Enter alteast one search Criteria.");
-    } else {
-      SetErrorMessage("");
-      //no need to show the header text .
-      SetVisibleHeaderText(false);
-
-      trackPromise(fetchSearchData());
-    }
-  };
-
-  const fetchSearchData = async () => {
-    SetVisibleSearchResult(false);
-    SetProviderDisplay([]);
-
-    let url =
-      "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =
-    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    url = url + "provider=" + providerName.trim();
-
-    if (specialtySelected === undefined || specialtySelected === "0") {
-      url = url + "&specialty_code=";
-    } else {
-      url = url + "&specialty_code=" + specialtySelected;
-    }
-
-    if (countySelected === undefined || countySelected === "0") {
-      url = url + "&county=";
-    } else {
-      url = url + "&county=" + countySelected;
-    }
-    url = url + "&city=" + city.trim();
-    //console.log(url);
-
-    try {
-      const result = await axios(url);
-
-      if (result.data.providerDetails.length !== 0) {
-        SetVisibleSearchResult(true);
-      } else {
-        SetErrorMessage("No Matching Records Found.");
-        SetVisibleSearchResult(false);
-      }
-
-      SetProviderDisplay(result.data.providerDetails);
-    } catch (error) {
-      SetErrorMessage("Error Fetching data.");
-    }
-  };
-
-  //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
-  //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
   const onResetClick = event => {
+    event.preventDefault();
     SetProviderName("");
     SetSpecialtySelected("0");
     SetCountySelected("0");
@@ -148,7 +145,6 @@ function SearchCritirea() {
     SetErrorMessage("");
     SetVisibleSearchResult(false);
     SetVisibleHeaderText(true);
-    event.preventDefault();
   };
 
   const printOrder = event => {
@@ -261,7 +257,7 @@ function SearchCritirea() {
               <div className="d-none" id="printme">
                 <SearchResults
                   id="sr2"
-                  providerDisplay={providerDisplay}
+                          providerDisplay={providerDisplay}
                   showPagination={false}
                 />
               </div>

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import paginationFactory from "react-bootstrap-table2-paginator";
 
+//https://codesandbox.io/s/react-bootstrap-table-next-basic-example-fsgk9
 function SearchResults(props) {
   const providerDisplay = props.providerDisplay;
   const showPagination = props.showPagination;
@@ -17,8 +18,9 @@ function SearchResults(props) {
     {
       dataField: "prov_name",
       text: "Provider",
+
       formatter: (cell, row, rowIndex, extraData) => (
-        <div key={rowIndex}>
+        <div>
           <span>{row.prov_name}</span>
           <br />
           <span> {row.prov_addr_str1}</span>
@@ -44,8 +46,9 @@ function SearchResults(props) {
     {
       dataField: "Information",
       text: "Information",
+
       formatter: (cell, row, rowIndex, extraData) => (
-        <div key={rowIndex}>
+        <div>
           <span>Speciality:</span>
           <span> {row.prov_specicialty}</span>
           <br />
@@ -54,6 +57,7 @@ function SearchResults(props) {
             {row.prov_lang_capabilities}
           </span>
           <br />
+
           <span>Accepting new Patients: </span>
           <span>{row.prov_new_patient}</span>
         </div>
@@ -63,7 +67,7 @@ function SearchResults(props) {
       dataField: "DHCP/PCP",
       text: "DHCP/PCP",
       formatter: (cell, row, rowIndex, extraData) => (
-        <div key={rowIndex}>
+        <div>
           <span>DHCP: </span> {row.prov_dhcp}
           <br />
           <span>PCP: </span> {row.prov_pcp}
@@ -73,6 +77,7 @@ function SearchResults(props) {
   ];
 
   const options = {
+    // pageStartIndex: 0,
     sizePerPage: 10,
     hideSizePerPage: true,
     hidePageListOnlyOnePage: true
