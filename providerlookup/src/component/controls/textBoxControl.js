@@ -1,10 +1,13 @@
 import React from "react";
 
 function TextBoxControl(props) {
+  let controlfocus=props.controlfocus;
   return (
     <div className="form-group row" style={{ "marginLeft":"10px","marginRight":"10px"}}>
-      <label className="col-sm-2 control-label text-type-bold" ><b>{props.labelText}</b></label>
-      <div className="col-sm-6 col-lg-10">
+      <div className="col-sm-2 col-md-2 col-lg-3">
+        <label className="control-label text-type-bold" ><b>{props.labelText}</b></label>
+        </div>
+      <div className="col-sm-10 col-md-10 col-lg-9">
         <input
           type="search"
           placeholder={props.placeholder}
@@ -12,6 +15,8 @@ function TextBoxControl(props) {
           onChange={props.onChange}
           className="form-control"
           style={{ texttransform: "uppercase" }}
+       
+          ref={controlfocus?pkv => pkv && pkv.focus():null}
         />
       </div>
     </div>

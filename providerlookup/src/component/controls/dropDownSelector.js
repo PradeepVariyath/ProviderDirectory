@@ -6,8 +6,10 @@ function DropDownSelector(props) {
 
   return (
     <div className="form-group row " style={{ marginLeft:"10px",marginRight:"10px"}}>
-      <label className="col-sm-2 control-label"><b >{props.labelText}</b></label>
-      <div className="col-sm-6 col-lg-10">
+     <div className="col-sm-2 col-md-2 col-lg-3">
+        <label className="control-label text-type-bold"><b >{props.labelText}</b></label>
+        </div>
+      <div className="col-sm-10 col-md-10 col-lg-9">
         <select onChange={onChange}   key={props.value} value={props.value} className="form-control">
           <option key="0" value="0">
             {props.defaultText}

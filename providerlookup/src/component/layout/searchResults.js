@@ -12,8 +12,8 @@ function SearchResults(props) {
   const columns = [
     {
       dataField: "id",
-      text: "id",
-      hidden: true
+      text: "id"
+  
     },
     {
       dataField: "prov_name",
@@ -84,6 +84,7 @@ function SearchResults(props) {
   };
 
   return (
+    <React.Fragment>
     <BootstrapTable
       id={id}
       keyField="id"
@@ -91,6 +92,7 @@ function SearchResults(props) {
       columns={columns}
       pagination={showPagination ? paginationFactory(options) : null}
     />
+    </React.Fragment>
   );
 }
 export default SearchResults;

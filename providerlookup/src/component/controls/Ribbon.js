@@ -1,6 +1,6 @@
 import React from "react";
 
-function ErrorMessage(props) {
+function Ribbon(props) {
   let controlType = props.controlType;
     return (    
    <React.Fragment>
@@ -14,4 +14,4 @@ function ErrorMessage(props) {
      </React.Fragment>
     );
 }
-export default ErrorMessage;
+export default Ribbon;

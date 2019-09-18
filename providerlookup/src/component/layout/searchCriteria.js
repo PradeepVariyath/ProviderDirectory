@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TextBarControl from "../controls/textBar";
+import Ribbon from "../controls/Ribbon";
 import TextBoxControl from "../controls/textBoxControl";
 import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
@@ -36,29 +36,30 @@ function SearchCritirea() {
   const initialSearchValue = [{}];
   const [providerDisplay, SetProviderDisplay] = useState(initialSearchValue);
 
-  useEffect(() => {
+  useEffect(() => {    
     fetchInitialData();
   }, []);
 
   const onProvideChange = event => {
-    SetProviderName(event.target.value.toUpperCase());
+    const provName=event.target.value;
+    SetProviderName(provName.toUpperCase());
   };
   const onCityChange = event => {
     SetCity(event.target.value.toUpperCase());
   };
 
   const onSpecialtySelection = event => {
-    const value = event.target.value;
-
-    let specialtyIndex = specialtys.filter(state => state.value === value);
+    const specialtyvalue = event.target.value;
+    let specialtyIndex = specialtys.filter(state => state.value === specialtyvalue);
     SetSpecialtySelected(specialtyIndex[0].value);
+    
   };
 
   const onCountySelection = event => {
-    const value = event.target.value;
-
-    const countyIndex = county.filter(state => state.value === value);
-    SetCountySelected(countyIndex[0].value);
+    const value = event.target.value;    
+      const countyIndex = county.filter(state => state.value === value);
+      SetCountySelected(countyIndex[0].value);
+    
   };
 
   const onSearchBtnClick = event => {
@@ -107,6 +108,7 @@ function SearchCritirea() {
       if (result.data.providerDetails.length > 0) {
         SetVisibleSearchResult(true);
         SetProviderDisplay(result.data.providerDetails);
+
       } else {
         SetErrorMessage("No Matching Records Found.");
         SetVisibleSearchResult(false);
@@ -122,9 +124,9 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-          "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+         "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-      //  "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+    // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
@@ -167,26 +169,27 @@ function SearchCritirea() {
             <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
               {/* One */}
             </div>
-            <div className="col-xs-8 col-sm-8 col-md-4 col-lg-8 ">
+            <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
               {visibleHeaderText ? <Header /> : null}
 
               <div>
-                <TextBarControl
+                <Ribbon
                   labelText="Enter Search Criteria"
                   controlType="titleBar"
                 />
-                <br />
+                <br />              
                 <TextBoxControl
                   id="ct0"
                   placeholder="Enter Provider Name"
                   labelText="Provider Name: "
                   Value={providerName}
                   onChange={onProvideChange}
-                  autoFocus
+                  controlfocus={true}
+                  
                 />
                 <DropDownSelector
                   value={specialtySelected}
-                  labelText="Specialty : "
+                  labelText="Specialty: "
                   defaultText="--- Select A Speciality ---"
                   options={specialtys}
                   onChange={onSpecialtySelection}
@@ -204,8 +207,9 @@ function SearchCritirea() {
                   placeholder="Enter City Name"
                   Value={city}
                   onChange={onCityChange}
+                  controlfocus={false}
                 />
-                <TextBarControl labelText="&nbsp;" controlType="titleBar" />
+                <Ribbon labelText="&nbsp;" controlType="titleBar" />
               </div>
               <br />
               <div className="float-right">
@@ -241,13 +245,14 @@ function SearchCritirea() {
                 {visibleSearchResult ? (
                   <div>
                     <SearchResults
+                   
                       id="sr1"
                       providerDisplay={providerDisplay}
                       showPagination={true}
                     />
                   </div>
                 ) : (
-                  <TextBarControl
+                  <Ribbon
                     labelText={errorMessage}
                     controlType="errorMessage"
                   />
@@ -256,13 +261,14 @@ function SearchCritirea() {
 
               <div className="d-none" id="printme">
                 <SearchResults
+                key ="2"
                   id="sr2"
-                          providerDisplay={providerDisplay}
+                   providerDisplay={providerDisplay}
                   showPagination={false}
                 />
               </div>
             </div>
-            <div className="col-sm-2 col-md-2 col-lg-2">{/* Three */}</div>
+            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">{/* Three */}</div>
           </div>
         </div>
       </form>
@@ -271,3 +277,9 @@ function SearchCritirea() {
 }
 
 export default SearchCritirea;
+
+//todo
+//variable standardisation
+//overlap
+//set focus
+//iis shorten url.
