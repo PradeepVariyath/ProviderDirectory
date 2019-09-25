@@ -50,15 +50,15 @@ function SearchCritirea() {
 
   const onSpecialtySelection = event => {
     const specialtyvalue = event.target.value;
-    let specialtyIndex = specialtys.filter(state => state.value === specialtyvalue);
-    SetSpecialtySelected(specialtyIndex[0].value);
+    let specialtyIndex = specialtys.find(state => state.value === specialtyvalue);
+    SetSpecialtySelected(specialtyIndex.value);
     
   };
 
   const onCountySelection = event => {
     const value = event.target.value;    
-      const countyIndex = county.filter(state => state.value === value);
-      SetCountySelected(countyIndex[0].value);
+      const countyIndex = county.find(state => state.value === value);
+      SetCountySelected(countyIndex.value);
     
   };
 
@@ -85,9 +85,9 @@ function SearchCritirea() {
    
     SetProviderDisplay(initialSearchValue);
 
-   let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =
-    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+   //let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url =
+      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -124,9 +124,9 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-         "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+     //    "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-    // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+     "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
