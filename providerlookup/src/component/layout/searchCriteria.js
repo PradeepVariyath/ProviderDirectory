@@ -85,9 +85,9 @@ function SearchCritirea() {
    
     SetProviderDisplay(initialSearchValue);
 
-  // let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    let url =
-      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    // let url =
+    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -124,9 +124,9 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-      // "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+      "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-     "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+    //  "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
