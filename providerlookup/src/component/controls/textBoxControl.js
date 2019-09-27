@@ -9,14 +9,14 @@ function TextBoxControl(props) {
         </div>
       <div className="col-sm-10 col-md-10 col-lg-9">
         <input
-          type="search"
+          type="input"
           placeholder={props.placeholder}
           value={props.Value.toUpperCase()}
           onChange={props.onChange}
           className="form-control"
-          style={{ texttransform: "uppercase" }}
-       
-          ref={controlfocus?pkv => pkv && pkv.focus():null}
+          style={{ texttransform: "uppercase" }}       
+          ref={controlfocus?x => x && x.focus():null}
+          autoComplete="On"
         />
       </div>
     </div>

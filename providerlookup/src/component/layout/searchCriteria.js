@@ -85,7 +85,7 @@ function SearchCritirea() {
    
     SetProviderDisplay(initialSearchValue);
 
-   //let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+  // let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     let url =
       "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
@@ -124,7 +124,7 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-     //    "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+      // "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
@@ -170,14 +170,14 @@ function SearchCritirea() {
               {/* One */}
             </div>
             <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
-              {visibleHeaderText ? <Header /> : null}
+             <div className="d-none d-md-block">
+             {visibleHeaderText ? <Header /> : null}</div> 
 
-              <div>
+              <div >
                 <Ribbon
                   labelText="Enter Search Criteria"
                   controlType="titleBar"
-                />
-                <br />              
+                />                      
                 <TextBoxControl
                   id="ct0"
                   placeholder="Enter Provider Name"
@@ -211,7 +211,6 @@ function SearchCritirea() {
                 />
                 <Ribbon labelText="&nbsp;" controlType="titleBar" />
               </div>
-              <br />
               <div className="float-right">
                 <Button
                   type="Submit"

@@ -3,7 +3,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import paginationFactory from "react-bootstrap-table2-paginator";
-
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 //https://codesandbox.io/s/react-bootstrap-table-next-basic-example-fsgk9
 function SearchResults(props) {
   const providerDisplay = props.providerDisplay;
@@ -12,13 +12,14 @@ function SearchResults(props) {
   const columns = [
     {
       dataField: "id",
-      text: "id"
-  
+      text: "id",
+      sort: true,
+      hidden: true
     },
     {
       dataField: "prov_name",
       text: "Provider",
-
+      sort:true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
           <span>{row.prov_name}</span>
@@ -44,9 +45,9 @@ function SearchResults(props) {
       //formatExtraData: this.state.count
     },
     {
-      dataField: "Information",
+      dataField: "prov_specicialty",
       text: "Information",
-
+      sort: true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
           <span>Speciality:</span>
@@ -64,8 +65,9 @@ function SearchResults(props) {
       )
     },
     {
-      dataField: "DHCP/PCP",
+      dataField: "prov_dhcp",
       text: "DHCP/PCP",
+      sort: true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
           <span>DHCP: </span> {row.prov_dhcp}
@@ -83,14 +85,17 @@ function SearchResults(props) {
     hidePageListOnlyOnePage: true
   };
 
+ 
   return (
     <React.Fragment>
     <BootstrapTable
+    bootstrap4
       id={id}
       keyField="id"
       data={providerDisplay}
       columns={columns}
       pagination={showPagination ? paginationFactory(options) : null}
+      filter={ filterFactory() }
     />
     </React.Fragment>
   );
