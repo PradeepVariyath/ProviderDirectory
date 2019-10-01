@@ -14,9 +14,9 @@ function TextBoxControl(props) {
           value={props.Value.toUpperCase()}
           onChange={props.onChange}
           className="form-control"
-          style={{ texttransform: "uppercase" }}       
+          style={{ texttransform: "uppercase"}}       
           ref={controlfocus?x => x && x.focus():null}
-          autoComplete="On"
+          autocomplete="on"
         />
       </div>
     </div>

@@ -1,10 +1,11 @@
 import React from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+//import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import paginationFactory from "react-bootstrap-table2-paginator";
-import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
 //https://codesandbox.io/s/react-bootstrap-table-next-basic-example-fsgk9
+
 function SearchResults(props) {
   const providerDisplay = props.providerDisplay;
   const showPagination = props.showPagination;
@@ -88,7 +89,7 @@ function SearchResults(props) {
  
   return (
     <React.Fragment>
-    <BootstrapTable
+    <BootstrapTable style={{margintop:"10px"}}
     bootstrap4
       id={id}
       keyField="id"

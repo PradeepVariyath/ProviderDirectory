@@ -6,7 +6,7 @@ import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
 import Header from "./header";
 import { Button } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import { trackPromise } from "react-promise-tracker";
 
 function SearchCritirea() {
@@ -14,7 +14,9 @@ function SearchCritirea() {
   const [providerName, SetProviderName] = useState("");
   const [city, SetCity] = useState("");
 
-  const initialSpecialtyValue = [{ value: "0", label: "Select a Specialty" }];
+  const initialSpecialtyValue = [
+    { value: "0", label: "--- Select A Speciality ---" }
+  ];
   const [specialtySelected, SetSpecialtySelected] = useState(
     initialSpecialtyValue[0].value
   );
@@ -36,12 +38,12 @@ function SearchCritirea() {
   const initialSearchValue = [{}];
   const [providerDisplay, SetProviderDisplay] = useState(initialSearchValue);
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchInitialData();
   }, []);
 
   const onProvideChange = event => {
-    const provName=event.target.value;
+    const provName = event.target.value;
     SetProviderName(provName.toUpperCase());
   };
   const onCityChange = event => {
@@ -49,17 +51,27 @@ function SearchCritirea() {
   };
 
   const onSpecialtySelection = event => {
-    const specialtyvalue = event.target.value;
-    let specialtyIndex = specialtys.find(state => state.value === specialtyvalue);
-    SetSpecialtySelected(specialtyIndex.value);
-    
+    const specialtyValue = event.target.value;
+
+    if (specialtyValue === "0") {
+      SetSpecialtySelected(initialSpecialtyValue[0].value);
+    } else {
+      let specialtyIndex = specialtys.find(
+        state => state.value === specialtyValue
+      );
+      SetSpecialtySelected(specialtyIndex.value);
+    }
   };
 
   const onCountySelection = event => {
-    const value = event.target.value;    
-      const countyIndex = county.find(state => state.value === value);
+    const contyValue = event.target.value;
+
+    if (contyValue === "0") {
+      SetCountySelected(initialCountyValue[0].value);
+    } else {
+      const countyIndex = county.find(state => state.value === contyValue);
       SetCountySelected(countyIndex.value);
-    
+    }
   };
 
   const onSearchBtnClick = event => {
@@ -68,6 +80,7 @@ function SearchCritirea() {
     SetVisibleHeaderText(false);
     //Set the Search Result Visible false
     SetVisibleSearchResult(false);
+
     if (
       providerName.trim() === "" &&
       city.trim() === "" &&
@@ -75,6 +88,15 @@ function SearchCritirea() {
       specialtySelected === "0"
     ) {
       SetErrorMessage("Please Enter alteast one search Criteria.");
+    } else if (
+      providerName.trim().length < 3 &&
+      city.trim() === "" &&
+      countySelected === "0" &&
+      specialtySelected === "0"
+    ) {
+      SetErrorMessage(
+        "Please enter minimum 3 characters of provider name or enter more search criteria."
+      );
     } else {
       SetErrorMessage("");
       trackPromise(fetchSearchData());
@@ -82,10 +104,9 @@ function SearchCritirea() {
   };
 
   const fetchSearchData = async () => {
-   
     SetProviderDisplay(initialSearchValue);
 
-  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+     let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     // let url =
     //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
@@ -108,7 +129,6 @@ function SearchCritirea() {
       if (result.data.providerDetails.length > 0) {
         SetVisibleSearchResult(true);
         SetProviderDisplay(result.data.providerDetails);
-
       } else {
         SetErrorMessage("No Matching Records Found.");
         SetVisibleSearchResult(false);
@@ -124,9 +144,9 @@ function SearchCritirea() {
   const fetchInitialData = async () => {
     try {
       const result = await axios(
-      "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+       "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-    //  "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
@@ -163,21 +183,23 @@ function SearchCritirea() {
 
   return (
     <React.Fragment>
-      <form onSubmit={onSearchBtnClick}>
+      <form onSubmit={onSearchBtnClick} autocomplete="on">
         <div className="container-fluid">
           <div className="row">
             <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
               {/* One */}
             </div>
             <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
-             <div className="d-none d-md-block">
-             {visibleHeaderText ? <Header /> : null}</div> 
+              <div className="d-none d-md-block">
+                {visibleHeaderText ? <Header /> : null}
+              </div>
 
-              <div >
+              <div>
                 <Ribbon
                   labelText="Enter Search Criteria"
                   controlType="titleBar"
-                />                      
+                />
+
                 <TextBoxControl
                   id="ct0"
                   placeholder="Enter Provider Name"
@@ -185,7 +207,6 @@ function SearchCritirea() {
                   Value={providerName}
                   onChange={onProvideChange}
                   controlfocus={true}
-                  
                 />
                 <DropDownSelector
                   value={specialtySelected}
@@ -211,63 +232,63 @@ function SearchCritirea() {
                 />
                 <Ribbon labelText="&nbsp;" controlType="titleBar" />
               </div>
-              <div className="float-right">
+
+              <div className="float-right p-3"   >
                 <Button
                   type="Submit"
-                  className="btn btn-primary"
+                  className="btn btn-primary ml-3"
                   onClick={onSearchBtnClick}
                 >
                   Search
                 </Button>
-                <span> </span>
                 <Button
                   type="Button"
-                  className="btn btn-primary"
+                  className="btn-primary ml-3"
                   onClick={onResetClick}
                 >
                   Reset
                 </Button>{" "}
-                <span> </span>
                 {visibleSearchResult ? (
                   <Button
                     type="Button"
-                    className="btn btn-primary"
+                    className="btn-primary ml-3"
                     onClick={printOrder}
+                  
                   >
                     Print
                   </Button>
                 ) : null}
               </div>
-              <br />
-              <br />
-              <div>
+
+              <div style={{ clear: "both" }}>
                 {visibleSearchResult ? (
+                  <SearchResults
+                    id="sr1"
+                    providerDisplay={providerDisplay}
+                    showPagination={true}
+                  />
+                ) : (
                   <div>
-                    <SearchResults
-                   
-                      id="sr1"
-                      providerDisplay={providerDisplay}
-                      showPagination={true}
+                    <Ribbon
+                      labelText={errorMessage}
+                      controlType="errorMessage"
                     />
                   </div>
-                ) : (
-                  <Ribbon
-                    labelText={errorMessage}
-                    controlType="errorMessage"
-                  />
                 )}
               </div>
 
               <div className="d-none" id="printme">
                 <SearchResults
-                key ="2"
+                  key="2"
                   id="sr2"
-                   providerDisplay={providerDisplay}
+                  providerDisplay={providerDisplay}
                   showPagination={false}
                 />
               </div>
             </div>
-            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">{/* Three */}</div>
+            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+              {/* Three */}
+            </div>
           </div>
         </div>
       </form>

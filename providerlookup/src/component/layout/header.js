@@ -3,7 +3,7 @@ import React from "react";
 function Header() {
   return (
     <React.Fragment>
-      <div>
+      <div >
         <h1>Find a Provider</h1>
         <p  style={{ "marginTop":"1em","marginBottom":"1em"}}>
           Have you had trouble finding a provider ? Use Provider Locator in your
