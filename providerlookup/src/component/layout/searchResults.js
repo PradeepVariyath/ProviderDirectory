@@ -89,8 +89,7 @@ function SearchResults(props) {
  
   return (
     <React.Fragment>
-    <BootstrapTable style={{margintop:"10px"}}
-    bootstrap4
+    <BootstrapTable    bootstrap4
       id={id}
       keyField="id"
       data={providerDisplay}

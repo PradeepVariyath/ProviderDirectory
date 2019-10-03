@@ -1,11 +1,12 @@
 import React from "react";
+import "../../app.css"
 
 function Header() {
   return (
     <React.Fragment>
       <div >
-        <h1>Find a Provider</h1>
-        <p  style={{ "marginTop":"1em","marginBottom":"1em"}}>
+        <h1>Find a Provider</h1>       
+        <p>
           Have you had trouble finding a provider ? Use Provider Locator in your
           community who sees and accepts Medicaid and CHIP.
         </p>

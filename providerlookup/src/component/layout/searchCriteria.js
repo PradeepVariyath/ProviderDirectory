@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Ribbon from "../controls/Ribbon";
-import TextBoxControl from "../controls/textBoxControl";
-import DropDownSelector from "../controls/dropDownSelector";
 import SearchResults from "./searchResults";
 import Header from "./header";
 import { Button } from "react-bootstrap";
-//import "bootstrap/dist/css/bootstrap.min.css";
 import { trackPromise } from "react-promise-tracker";
+import Loader from "react-loader-spinner";
 
 function SearchCritirea() {
   //Set the States for initializing the search controls
-  const [providerName, SetProviderName] = useState("");
+  const [providerName, SetProviderName] = useState("BACHAR");
   const [city, SetCity] = useState("");
 
   const initialSpecialtyValue = [
@@ -37,10 +35,43 @@ function SearchCritirea() {
   //Data Fetched on Search button click
   const initialSearchValue = [{}];
   const [providerDisplay, SetProviderDisplay] = useState(initialSearchValue);
+  const [searchUrl, SetSearchUrl] = useState("");
+  const [loading, SetLoading] = useState(false);
 
   useEffect(() => {
+    SetLoading(false);
     fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const abortController = new AbortController();
+    (async () => {
+      const res = await trackPromise(
+        fetch(searchUrl, {
+          signal: abortController.signal
+        })
+      );
+      const data = await trackPromise(res.json());
+
+      if (mounted) {
+        SetLoading(false);
+        if (data.providerDetails.length > 0) {
+          SetVisibleSearchResult(true);
+          SetProviderDisplay(data.providerDetails);
+        } else {
+          SetErrorMessage("No Matching Records Found.");
+          SetVisibleSearchResult(false);
+        }
+      }
+    })();
+    const cleanup = () => {
+      mounted = false;
+      SetLoading(false);
+      abortController.abort();
+    };
+    return cleanup;
+  }, [searchUrl]);
 
   const onProvideChange = event => {
     const provName = event.target.value;
@@ -74,7 +105,29 @@ function SearchCritirea() {
     }
   };
 
+  //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
+  //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+  const fetchInitialData = async () => {
+    try {
+      const result = await axios(
+        //"https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+        "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+      );
+
+      SetSpecialtys(result.data.SpecialityList);
+      SetCounty(result.data.CountyList);
+    } catch (error) {
+      SetLoading(false);
+      SetErrorMessage(
+        "Error in Loading Specialty, County Information, Please contact Technical Support Team."
+      );
+    }
+  };
+
   const onSearchBtnClick = event => {
+    SetLoading(true);
     event.preventDefault();
     //no need to show the header text .
     SetVisibleHeaderText(false);
@@ -88,6 +141,7 @@ function SearchCritirea() {
       specialtySelected === "0"
     ) {
       SetErrorMessage("Please Enter alteast one search Criteria.");
+      SetLoading(false);
     } else if (
       providerName.trim().length < 3 &&
       city.trim() === "" &&
@@ -97,18 +151,19 @@ function SearchCritirea() {
       SetErrorMessage(
         "Please enter minimum 3 characters of provider name or enter more search criteria."
       );
+      SetLoading(false);
     } else {
       SetErrorMessage("");
-      trackPromise(fetchSearchData());
+      fetchSearchData();
+      //  trackPromise(fetchSearchData());
     }
   };
 
   const fetchSearchData = async () => {
     SetProviderDisplay(initialSearchValue);
-
-     let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =
-    //   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    //  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url =
+      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -119,47 +174,13 @@ function SearchCritirea() {
       countySelected === "0"
         ? url + "&county="
         : url + "&county=" + countySelected;
-
     url = url + "&city=" + city.trim();
-    console.log(url);
-    try {
-      const result = await axios(url);
-
-      //if Length > 0 Set the output otherwise Set error Message
-      if (result.data.providerDetails.length > 0) {
-        SetVisibleSearchResult(true);
-        SetProviderDisplay(result.data.providerDetails);
-      } else {
-        SetErrorMessage("No Matching Records Found.");
-        SetVisibleSearchResult(false);
-      }
-    } catch (error) {
-      SetErrorMessage("Error Fetching data.");
-    }
-  };
-
-  //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
-  //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-
-  const fetchInitialData = async () => {
-    try {
-      const result = await axios(
-       "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-
-        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-      );
-
-      SetSpecialtys(result.data.SpecialityList);
-      SetCounty(result.data.CountyList);
-    } catch (error) {
-      SetErrorMessage(
-        "Error in Loading Specialty, County Information, Please contact Technical Support Team."
-      );
-    }
+    SetSearchUrl(url);
   };
 
   const onResetClick = event => {
     event.preventDefault();
+    SetSearchUrl("");
     SetProviderName("");
     SetSpecialtySelected("0");
     SetCountySelected("0");
@@ -183,7 +204,7 @@ function SearchCritirea() {
 
   return (
     <React.Fragment>
-      <form onSubmit={onSearchBtnClick} autocomplete="on">
+      <form onSubmit={onSearchBtnClick}>
         <div className="container-fluid">
           <div className="row">
             <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
@@ -199,41 +220,105 @@ function SearchCritirea() {
                   labelText="Enter Search Criteria"
                   controlType="titleBar"
                 />
+                {/* Provider Name Text  */}
+                <div className="form-group row  mb-2 mr-2 mt-2 ml-2">
+                  <div className="col-sm-2 col-md-2 col-lg-3">
+                    <label className="control-label">
+                      <strong>Provider Name:</strong>
+                    </label>
+                  </div>
+                  <div className="col-sm-10 col-md-10 col-lg-9">
+                    <input
+                      type="input"
+                      id="txtProviderName"
+                      name="txtProviderName"
+                      placeholder="Enter Provider Name"
+                      value={providerName.toUpperCase()}
+                      onChange={onProvideChange}
+                      className="form-control text-uppercase"
+                      autoFocus
+                    />
+                  </div>
+                </div>
 
-                <TextBoxControl
-                  id="ct0"
-                  placeholder="Enter Provider Name"
-                  labelText="Provider Name: "
-                  Value={providerName}
-                  onChange={onProvideChange}
-                  controlfocus={true}
-                />
-                <DropDownSelector
-                  value={specialtySelected}
-                  labelText="Specialty: "
-                  defaultText="--- Select A Speciality ---"
-                  options={specialtys}
-                  onChange={onSpecialtySelection}
-                />
-                <DropDownSelector
-                  value={countySelected}
-                  labelText="County: "
-                  defaultText="--- Select A County ---"
-                  options={county}
-                  onChange={onCountySelection}
-                />
-                <TextBoxControl
-                  id="ct1"
-                  labelText="City: "
-                  placeholder="Enter City Name"
-                  Value={city}
-                  onChange={onCityChange}
-                  controlfocus={false}
-                />
+                {/* Specialty Dropdown  */}
+                <div className="form-group row  mb-2 mr-2 mt-2 ml-2">
+                  <div className="col-sm-2 col-md-2 col-lg-3">
+                    <label className="control-label">
+                      <strong>Specialty:</strong>
+                    </label>
+                  </div>
+                  <div className="col-sm-10 col-md-10 col-lg-9">
+                    <select
+                      onChange={onSpecialtySelection}
+                      key={specialtySelected}
+                      value={specialtySelected}
+                      className="form-control"
+                      // style={{ fontsize:"75%" }}
+                    >
+                      <option key="0" value="0">
+                        {"--- Select A Speciality ---"}
+                      </option>
+                      {specialtys.map((obj, index) => (
+                        <option key={index} value={obj.value}>
+                          {obj.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* County  Dropdown  */}
+                <div className="form-group row  mb-2 mr-2 mt-2 ml-2">
+                  <div className="col-sm-2 col-md-2 col-lg-3">
+                    <label className="control-label">
+                      <strong>County:</strong>
+                    </label>
+                  </div>
+                  <div className="col-sm-10 col-md-10 col-lg-9">
+                    <select
+                      onChange={onCountySelection}
+                      key={countySelected}
+                      value={countySelected}
+                      className="form-control"
+                      // style={{ fontsize:"75%" }}
+                    >
+                      <option key="0" value="0">
+                        {"--- Select A County ---"}
+                      </option>
+                      {county.map((obj, index) => (
+                        <option key={index} value={obj.value}>
+                          {obj.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* City Text  */}
+                <div className="form-group row  mb-2 mr-2 mt-2 ml-2">
+                  <div className="col-sm-2 col-md-2 col-lg-3">
+                    <label className="control-label">
+                      <strong>City:</strong>
+                    </label>
+                  </div>
+                  <div className="col-sm-10 col-md-10 col-lg-9">
+                    <input
+                      type="input"
+                      id="txtCity"
+                      name="txtCity"
+                      placeholder="Enter City Name"
+                      value={city.toUpperCase()}
+                      onChange={onCityChange}
+                      className="form-control text-uppercase"
+                    />
+                  </div>
+                </div>
+
                 <Ribbon labelText="&nbsp;" controlType="titleBar" />
               </div>
 
-              <div className="float-right p-3"   >
+              <div className="float-right p-2">
                 <Button
                   type="Submit"
                   className="btn btn-primary ml-3"
@@ -253,7 +338,6 @@ function SearchCritirea() {
                     type="Button"
                     className="btn-primary ml-3"
                     onClick={printOrder}
-                  
                   >
                     Print
                   </Button>
@@ -275,6 +359,10 @@ function SearchCritirea() {
                     />
                   </div>
                 )}
+              </div>
+              {/* <div>{loading ? <LoadingIndicator /> : null}</div>  */}
+              <div className="d-flex  justify-content-center align-items-center">
+                {loading ? <Loader type="ThreeDots" color="#1e6bd6" /> : ""}
               </div>
 
               <div className="d-none" id="printme">

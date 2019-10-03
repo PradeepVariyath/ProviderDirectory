@@ -6,17 +6,13 @@ function Ribbon(props) {
     <React.Fragment>
       {props.labelText ? (
         <div className="row">
-          <div
-            className="col-sm-12 col-md-12 col-lg-12"
-            style={{ fontWeight: "bold" }}
-          >
+          <div className="col-sm-12 col-md-12 col-lg-12 font-weight-bold p-2">
             <p
               className={
                 controlType === "errorMessage"
-                  ? "bg-danger text-white"
-                  : "bg-primary text-white"
+                  ? "bg-danger text-white display-block p-2"
+                  : "bg-primary text-white display-block p-2"
               }
-              style={{ fontWeight: "bold", display: "block", padding: "5px" }}
             >
               &nbsp;{props.labelText}
             </p>
