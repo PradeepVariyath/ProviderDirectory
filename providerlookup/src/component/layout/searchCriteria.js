@@ -9,7 +9,7 @@ import Loader from "react-loader-spinner";
 
 function SearchCritirea() {
   //Set the States for initializing the search controls
-  const [providerName, SetProviderName] = useState("BACHAR");
+  const [providerName, SetProviderName] = useState("");
   const [city, SetCity] = useState("");
 
   const initialSpecialtyValue = [
@@ -46,12 +46,14 @@ function SearchCritirea() {
   useEffect(() => {
     let mounted = true;
     const abortController = new AbortController();
+    console.log(searchUrl);
     (async () => {
       const res = await trackPromise(
         fetch(searchUrl, {
           signal: abortController.signal
         })
       );
+
       const data = await trackPromise(res.json());
 
       if (mounted) {
@@ -68,6 +70,7 @@ function SearchCritirea() {
     const cleanup = () => {
       mounted = false;
       SetLoading(false);
+
       abortController.abort();
     };
     return cleanup;
@@ -110,10 +113,10 @@ function SearchCritirea() {
 
   const fetchInitialData = async () => {
     try {
-      const result = await axios(
-        //"https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+       const result = await axios(
+         "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-        "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
 
       SetSpecialtys(result.data.SpecialityList);
@@ -127,12 +130,9 @@ function SearchCritirea() {
   };
 
   const onSearchBtnClick = event => {
-    SetLoading(true);
     event.preventDefault();
     //no need to show the header text .
     SetVisibleHeaderText(false);
-    //Set the Search Result Visible false
-    SetVisibleSearchResult(false);
 
     if (
       providerName.trim() === "" &&
@@ -160,10 +160,9 @@ function SearchCritirea() {
   };
 
   const fetchSearchData = async () => {
-    SetProviderDisplay(initialSearchValue);
-    //  let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    let url =
-      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+   
+    let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    // let url =      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -175,7 +174,16 @@ function SearchCritirea() {
         ? url + "&county="
         : url + "&county=" + countySelected;
     url = url + "&city=" + city.trim();
-    SetSearchUrl(url);
+
+    if (url !== searchUrl) {
+      SetSearchUrl(url);
+
+      SetProviderDisplay(initialSearchValue);
+      //Set the Search Result Visible false
+      SetVisibleSearchResult(false);
+    } else {
+      SetLoading(false);
+    }
   };
 
   const onResetClick = event => {
@@ -237,6 +245,7 @@ function SearchCritirea() {
                       onChange={onProvideChange}
                       className="form-control text-uppercase"
                       autoFocus
+                      maxLength="100"
                     />
                   </div>
                 </div>
@@ -311,6 +320,7 @@ function SearchCritirea() {
                       value={city.toUpperCase()}
                       onChange={onCityChange}
                       className="form-control text-uppercase"
+                      maxLength="50"
                     />
                   </div>
                 </div>

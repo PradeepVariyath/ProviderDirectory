@@ -22,25 +22,17 @@ function SearchResults(props) {
       text: "Provider",
       sort:true,
       formatter: (cell, row, rowIndex, extraData) => (
-        <div>
-          <span>{row.prov_name}</span>
-          <br />
-          <span> {row.prov_addr_str1}</span>
-          <br />
-          <span>
+        <div  >
+            <h6> <small>{row.prov_name}</small></h6>   
+            <h6> <small>{row.prov_addr_str1}</small></h6>    
+        
+            <h6><small>
             {row.prov_addr_mail_city},{row.prov_addr_mail_state}{" "}
             {row.prov_addr_zip}{" "}
-          </span>
-          <br />
-          <span>County : </span>
-          <span>
-            {row.prov_county}
-            <br />
-          </span>
-          <span>Phone : </span>
-          {row.prov_phone}
-          <br />
-          <span>Email : {row.prov_addr_email}</span>
+            </small></h6> 
+          <h6>County : <small> {row.prov_county}</small></h6>
+          <h6>Phone :  <small>{row.prov_phone}</small></h6>
+          <h6>Email :  <small>{row.prov_addr_email}</small></h6>         
         </div>
       )
       //formatExtraData: this.state.count
@@ -51,17 +43,9 @@ function SearchResults(props) {
       sort: true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
-          <span>Speciality:</span>
-          <span> {row.prov_specicialty}</span>
-          <br />
-          <span>
-            Linguistic capabilities:
-            {row.prov_lang_capabilities}
-          </span>
-          <br />
-
-          <span>Accepting new Patients: </span>
-          <span>{row.prov_new_patient}</span>
+           <h6>Speciality: <small>{row.prov_specicialty}</small></h6>          
+           <h6>Linguistic capabilities: <small> {row.prov_lang_capabilities}</small></h6>          
+           <h6>Accepting new Patients: <small> {row.prov_new_patient}</small></h6> 
         </div>
       )
     },
@@ -71,9 +55,8 @@ function SearchResults(props) {
       sort: true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
-          <span>DHCP: </span> {row.prov_dhcp}
-          <br />
-          <span>PCP: </span> {row.prov_pcp}
+           <h6>DHCP :  <small>{row.prov_dhcp}</small></h6>     
+           <h6>PCP :  <small>{row.prov_pcp}</small></h6>    
         </div>
       )
     }
