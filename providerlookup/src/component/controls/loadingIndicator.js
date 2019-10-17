@@ -6,12 +6,12 @@ const LoadingIndicator = () => {
     const { promiseInProgress } = usePromiseTracker();
     return (
       promiseInProgress && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
+        <div className="d-flex justify-content-center "
+          // style={{
+         
+          //   justifyContent: "center",
+          //   alignItems: "center"
+          // }}
         >
           <Loader type="ThreeDots" color="#1e6bd6" />
         </div>

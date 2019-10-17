@@ -1,6 +1,7 @@
 import React from "react";
-import SearchCriteria from "./component/layout/searchCriteria";
-import LoadingIndicator from "./component/controls/loadingIndicator";
+import SearchCriteria from "./component/layout/SearchCriteria";
+import LoadingIndicator from "./component/controls/LoadingIndicator";
+
 
 function App() {
   return (

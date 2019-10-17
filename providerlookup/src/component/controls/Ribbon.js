@@ -22,4 +22,5 @@ function Ribbon(props) {
     </React.Fragment>
   );
 }
+
 export default Ribbon;

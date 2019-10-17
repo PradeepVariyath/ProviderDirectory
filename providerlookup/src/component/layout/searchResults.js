@@ -1,10 +1,9 @@
 import React from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 import "bootstrap/dist/css/bootstrap.min.css";
-//import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import filterFactory from 'react-bootstrap-table2-filter';
-//https://codesandbox.io/s/react-bootstrap-table-next-basic-example-fsgk9
 
 function SearchResults(props) {
   const providerDisplay = props.providerDisplay;
@@ -24,8 +23,7 @@ function SearchResults(props) {
       formatter: (cell, row, rowIndex, extraData) => (
         <div  >
             <h6> <small>{row.prov_name}</small></h6>   
-            <h6> <small>{row.prov_addr_str1}</small></h6>    
-        
+            <h6> <small>{row.prov_addr_str1}</small></h6> 
             <h6><small>
             {row.prov_addr_mail_city},{row.prov_addr_mail_state}{" "}
             {row.prov_addr_zip}{" "}
@@ -35,7 +33,7 @@ function SearchResults(props) {
           <h6>Email :  <small>{row.prov_addr_email}</small></h6>         
         </div>
       )
-      //formatExtraData: this.state.count
+
     },
     {
       dataField: "prov_specicialty",
@@ -44,14 +42,14 @@ function SearchResults(props) {
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
            <h6>Speciality: <small>{row.prov_specicialty}</small></h6>          
-           <h6>Linguistic capabilities: <small> {row.prov_lang_capabilities}</small></h6>          
-           <h6>Accepting new Patients: <small> {row.prov_new_patient}</small></h6> 
+           <h6>Secondary Language: <small> {row.prov_lang_capabilities}</small></h6>          
+           <h6>Accepting New Patients: <small> {row.prov_new_patient}</small></h6> 
         </div>
       )
     },
     {
       dataField: "prov_dhcp",
-      text: "DHCP/PCP",
+      text: "Provider Use Only",
       sort: true,
       formatter: (cell, row, rowIndex, extraData) => (
         <div>
@@ -62,19 +60,17 @@ function SearchResults(props) {
     }
   ];
 
-  const options = {
-    // pageStartIndex: 0,
+  const options = {    
     sizePerPage: 10,
     hideSizePerPage: true,
     hidePageListOnlyOnePage: true
   };
-
  
   return (
     <React.Fragment>
     <BootstrapTable    bootstrap4
       id={id}
-      keyField="id"
+      keyField={id}
       data={providerDisplay}
       columns={columns}
       pagination={showPagination ? paginationFactory(options) : null}

@@ -1,3 +1,19 @@
-p {
-    margin: 2px;
+/* do not group these rules*/
+.input-field::-webkit-input-placeholder {
+  color: lightgray;
+  font-size: 0.9rem;
+}
+
+.input-field:-moz-placeholder {
+    color: lightgray;
+    font-size: 0.9rem;
+}
+
+.input-field::-moz-placeholder {
+    color: lightgray;
+    font-size: 0.9rem;
+}
+.input-field:-ms-input-placeholder {
+    color:lightgray;
+    font-size: 0.9rem; 
 }

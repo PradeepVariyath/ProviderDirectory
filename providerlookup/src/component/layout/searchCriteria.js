@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Ribbon from "../controls/Ribbon";
-import SearchResults from "./searchResults";
-import Header from "./header";
+import SearchResults from "./SearchResults";
+import Header from "./Header";
 import { Button } from "react-bootstrap";
 import { trackPromise } from "react-promise-tracker";
 import Loader from "react-loader-spinner";
+import "promise-polyfill/src/polyfill";
+import "unfetch/polyfill";
+import "abortcontroller-polyfill";
+import "../../app.css";
 
 function SearchCritirea() {
   //Set the States for initializing the search controls
@@ -13,7 +17,7 @@ function SearchCritirea() {
   const [city, SetCity] = useState("");
 
   const initialSpecialtyValue = [
-    { value: "0", label: "--- Select A Speciality ---" }
+    { value: "0", label: "--- Select A Specialty ---" }
   ];
   const [specialtySelected, SetSpecialtySelected] = useState(
     initialSpecialtyValue[0].value
@@ -28,6 +32,7 @@ function SearchCritirea() {
     initialCountyValue[0].value
   );
   //Set Error Message
+  const initialErrorMessage= "Error in Loading Specialty, County Information, Please contact Technical Support Team.";
   const [errorMessage, SetErrorMessage] = useState("");
   //Set visibility for Header text and Search Result table
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
@@ -36,13 +41,15 @@ function SearchCritirea() {
   const initialSearchValue = [{}];
   const [providerDisplay, SetProviderDisplay] = useState(initialSearchValue);
   const [searchUrl, SetSearchUrl] = useState("");
-  const [loading, SetLoading] = useState(false);
+  const [loading, SetLoading] = useState(false); // use state used to display the busy Progress bar.
 
+  //Use Effect to fetch the initial data.
   useEffect(() => {
     SetLoading(false);
     fetchInitialData();
   }, []);
 
+  ///Use effect called when there is a change in the searUrl.
   useEffect(() => {
     let mounted = true;
     const abortController = new AbortController();
@@ -76,14 +83,17 @@ function SearchCritirea() {
     return cleanup;
   }, [searchUrl]);
 
+  ///fired when there is a change in Provider name input text box
   const onProvideChange = event => {
-    const provName = event.target.value;
-    SetProviderName(provName.toUpperCase());
+    SetProviderName(event.target.value.toUpperCase());
   };
+
+  ///fired when there is a change in city input text box
   const onCityChange = event => {
     SetCity(event.target.value.toUpperCase());
   };
 
+  ///fired when there the specialty dropdown value selected.
   const onSpecialtySelection = event => {
     const specialtyValue = event.target.value;
 
@@ -97,6 +107,7 @@ function SearchCritirea() {
     }
   };
 
+  ///fired when there the county dropdown value selected.
   const onCountySelection = event => {
     const contyValue = event.target.value;
 
@@ -108,17 +119,22 @@ function SearchCritirea() {
     }
   };
 
-  //https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData
-  //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-
+  ///Fetch initial data to fill the drop down for specialty, county.
   const fetchInitialData = async () => {
+    console.log(process.env);
+    console.log('The value of PORT is:', process.env.react);
+    const url ="";
+   // const url= process.env.REACT_APP_GET_INIT_URL;
+    console.log(url);
     try {
-       const result = await axios(
-         "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+      const result = await axios(
+        
+  //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
-        // "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+ "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+
+  
       );
-
       SetSpecialtys(result.data.SpecialityList);
       SetCounty(result.data.CountyList);
     } catch (error) {
@@ -129,11 +145,13 @@ function SearchCritirea() {
     }
   };
 
+  ///On SearchButton Click,
   const onSearchBtnClick = event => {
     event.preventDefault();
     //no need to show the header text .
     SetVisibleHeaderText(false);
-
+    //If there is error in initial loading then do not do any search.
+    if (errorMessage===initialErrorMessage) return;
     if (
       providerName.trim() === "" &&
       city.trim() === "" &&
@@ -149,20 +167,21 @@ function SearchCritirea() {
       specialtySelected === "0"
     ) {
       SetErrorMessage(
-        "Please enter minimum 3 characters of provider name or enter more search criteria."
+        initialErrorMessage
       );
       SetLoading(false);
     } else {
       SetErrorMessage("");
       fetchSearchData();
-      //  trackPromise(fetchSearchData());
     }
   };
 
+  ///Set the SearchUrl
   const fetchSearchData = async () => {
-   
-    let url =  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    // let url =      "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    // let url =
+    //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url =
+   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -175,6 +194,7 @@ function SearchCritirea() {
         : url + "&county=" + countySelected;
     url = url + "&city=" + city.trim();
 
+    ///If no search criteria changed and on  click of search nothing has to be done.
     if (url !== searchUrl) {
       SetSearchUrl(url);
 
@@ -186,6 +206,7 @@ function SearchCritirea() {
     }
   };
 
+  ///On Result Click.
   const onResetClick = event => {
     event.preventDefault();
     SetSearchUrl("");
@@ -198,6 +219,7 @@ function SearchCritirea() {
     SetVisibleHeaderText(true);
   };
 
+  ///On Print button click
   const printOrder = event => {
     const printableElements = document.getElementById("printme").innerHTML;
     const orderHtmlPage =
@@ -243,13 +265,12 @@ function SearchCritirea() {
                       placeholder="Enter Provider Name"
                       value={providerName.toUpperCase()}
                       onChange={onProvideChange}
-                      className="form-control text-uppercase"
+                      className="form-control text-uppercase input-field"
                       autoFocus
                       maxLength="100"
                     />
                   </div>
                 </div>
-
                 {/* Specialty Dropdown  */}
                 <div className="form-group row  mb-2 mr-2 mt-2 ml-2">
                   <div className="col-sm-2 col-md-2 col-lg-3">
@@ -263,10 +284,9 @@ function SearchCritirea() {
                       key={specialtySelected}
                       value={specialtySelected}
                       className="form-control"
-                      // style={{ fontsize:"75%" }}
                     >
                       <option key="0" value="0">
-                        {"--- Select A Speciality ---"}
+                        {"--- Select A Specialty ---"}
                       </option>
                       {specialtys.map((obj, index) => (
                         <option key={index} value={obj.value}>
@@ -284,15 +304,14 @@ function SearchCritirea() {
                       <strong>County:</strong>
                     </label>
                   </div>
-                  <div className="col-sm-10 col-md-10 col-lg-9">
-                    <select
+                  <div className="col-sm-10 col-md-10 col-lg-9  ">
+                    <select 
                       onChange={onCountySelection}
                       key={countySelected}
                       value={countySelected}
-                      className="form-control"
-                      // style={{ fontsize:"75%" }}
+                      className="form-control "
                     >
-                      <option key="0" value="0">
+                      <option  key="0" value="0" selected="true">
                         {"--- Select A County ---"}
                       </option>
                       {county.map((obj, index) => (
@@ -319,7 +338,7 @@ function SearchCritirea() {
                       placeholder="Enter City Name"
                       value={city.toUpperCase()}
                       onChange={onCityChange}
-                      className="form-control text-uppercase"
+                      className="form-control text-uppercase input-field"
                       maxLength="50"
                     />
                   </div>
@@ -370,7 +389,6 @@ function SearchCritirea() {
                   </div>
                 )}
               </div>
-              {/* <div>{loading ? <LoadingIndicator /> : null}</div>  */}
               <div className="d-flex  justify-content-center align-items-center">
                 {loading ? <Loader type="ThreeDots" color="#1e6bd6" /> : ""}
               </div>
@@ -395,9 +413,3 @@ function SearchCritirea() {
 }
 
 export default SearchCritirea;
-
-//todo
-//variable standardisation
-//overlap
-//set focus
-//iis shorten url.
