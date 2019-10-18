@@ -32,7 +32,8 @@ function SearchCritirea() {
     initialCountyValue[0].value
   );
   //Set Error Message
-  const initialErrorMessage= "Error in Loading Specialty, County Information, Please contact Technical Support Team.";
+  const initialErrorMessage =
+    "Error in Loading Specialty, County Information, Please contact Technical Support Team.";
   const [errorMessage, SetErrorMessage] = useState("");
   //Set visibility for Header text and Search Result table
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
@@ -121,19 +122,16 @@ function SearchCritirea() {
 
   ///Fetch initial data to fill the drop down for specialty, county.
   const fetchInitialData = async () => {
-    console.log(process.env);
-    console.log('The value of PORT is:', process.env.react);
-    const url ="";
-   // const url= process.env.REACT_APP_GET_INIT_URL;
+    console.log("The value of PORT is-1:", process.env.REACT_APP_URL);
+    const url = process.env.REACT_APP_URL + "/GetInitialData";
     console.log(url);
+    console.log("url");
     try {
       const result = await axios(
-        
-  //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
+        url
+        //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
 
- "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-
-  
+        //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
       );
       SetSpecialtys(result.data.SpecialityList);
       SetCounty(result.data.CountyList);
@@ -151,7 +149,7 @@ function SearchCritirea() {
     //no need to show the header text .
     SetVisibleHeaderText(false);
     //If there is error in initial loading then do not do any search.
-    if (errorMessage===initialErrorMessage) return;
+    if (errorMessage === initialErrorMessage) return;
     if (
       providerName.trim() === "" &&
       city.trim() === "" &&
@@ -166,9 +164,7 @@ function SearchCritirea() {
       countySelected === "0" &&
       specialtySelected === "0"
     ) {
-      SetErrorMessage(
-        initialErrorMessage
-      );
+      SetErrorMessage(initialErrorMessage);
       SetLoading(false);
     } else {
       SetErrorMessage("");
@@ -180,8 +176,9 @@ function SearchCritirea() {
   const fetchSearchData = async () => {
     // let url =
     //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    let url =
-   "http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url = process.env.REACT_APP_URL+"/ProviderDirectorySearch?";
+    console.log(url);
+    //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -305,13 +302,13 @@ function SearchCritirea() {
                     </label>
                   </div>
                   <div className="col-sm-10 col-md-10 col-lg-9  ">
-                    <select 
+                    <select
                       onChange={onCountySelection}
                       key={countySelected}
                       value={countySelected}
                       className="form-control "
                     >
-                      <option  key="0" value="0" selected="true">
+                      <option key="0" value="0" selected="true">
                         {"--- Select A County ---"}
                       </option>
                       {county.map((obj, index) => (
