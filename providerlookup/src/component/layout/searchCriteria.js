@@ -3,13 +3,15 @@ import axios from "axios";
 import Ribbon from "../controls/Ribbon";
 import SearchResults from "./SearchResults";
 import Header from "./Header";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "react-bootstrap";
 import { trackPromise } from "react-promise-tracker";
 import Loader from "react-loader-spinner";
+import "../../app.css";
+//needed below for rendering the page in IE.
 import "promise-polyfill/src/polyfill";
 import "unfetch/polyfill";
 import "abortcontroller-polyfill";
-import "../../app.css";
 
 function SearchCritirea() {
   //Set the States for initializing the search controls
@@ -33,7 +35,7 @@ function SearchCritirea() {
   );
   //Set Error Message
   const initialErrorMessage =
-    "Error in Loading Specialty, County Information, Please contact Technical Support Team.";
+    "Error in Loading Specialty, County Information. Please contact Technical Support Team.";
   const [errorMessage, SetErrorMessage] = useState("");
   //Set visibility for Header text and Search Result table
   const [visibleSearchResult, SetVisibleSearchResult] = useState(false);
@@ -44,57 +46,91 @@ function SearchCritirea() {
   const [searchUrl, SetSearchUrl] = useState("");
   const [loading, SetLoading] = useState(false); // use state used to display the busy Progress bar.
 
+  //URL Path
+  const [urlPath, SetUrlPath] = useState("");
+
   //Use Effect to fetch the initial data.
   useEffect(() => {
-    SetLoading(false);
-    fetchInitialData();
+    const hostname = window && window.location && window.location.hostname;
+    let url_path = "";
+    if (hostname === "localhost") {
+      url_path =
+        "http://localhost/Alportal/webservices/provider/ProviderDirectory.svc";
+    } else {
+      url_path =
+        "https://" +
+        hostname +
+        "/Alportal/webservices/provider/ProviderDirectory.svc";
+    }
+    SetUrlPath(url_path);
+
+    //Fetch initial data to fill the drop down for specialty, county.
+    const url = url_path + "/GetInitialData";
+    axios
+      .get(url)
+      .then(result => {
+        SetSpecialtys(result.data.SpecialityList);
+        SetCounty(result.data.CountyList);
+        SetErrorMessage("");
+      })
+      .catch(error => {
+        SetErrorMessage(initialErrorMessage);
+      });
   }, []);
 
-  ///Use effect called when there is a change in the searUrl.
+  //Use effect called when there is a change in the searUrl.
   useEffect(() => {
     let mounted = true;
     const abortController = new AbortController();
-    console.log(searchUrl);
-    (async () => {
-      const res = await trackPromise(
-        fetch(searchUrl, {
-          signal: abortController.signal
-        })
-      );
 
-      const data = await trackPromise(res.json());
+    try {
+      //console.log(searchUrl);
+      (async () => {
+        const res = await trackPromise(
+          fetch(searchUrl, {
+            signal: abortController.signal
+          })
+        );
 
-      if (mounted) {
-        SetLoading(false);
-        if (data.providerDetails.length > 0) {
-          SetVisibleSearchResult(true);
-          SetProviderDisplay(data.providerDetails);
-        } else {
-          SetErrorMessage("No Matching Records Found.");
-          SetVisibleSearchResult(false);
+        const data = await trackPromise(res.json());
+        if (mounted) {
+          SetLoading(false);
+          if (data.errorMessage.length > 0) {
+            SetErrorMessage(data.errorMessage);
+            SetVisibleSearchResult(false);
+          } else if (data.providerDetails.length > 0) {
+            SetVisibleSearchResult(true);
+            SetProviderDisplay(data.providerDetails);
+          } else {
+            SetErrorMessage("No Matching Records Found.");
+            SetVisibleSearchResult(false);
+          }
         }
-      }
-    })();
-    const cleanup = () => {
-      mounted = false;
-      SetLoading(false);
+      })();
+      const cleanup = () => {
+        mounted = false;
+        SetLoading(false);
 
-      abortController.abort();
-    };
-    return cleanup;
+        abortController.abort();
+      };
+
+      return cleanup;
+    } catch (error) {
+      SetErrorMessage("Error in Loading the search Result");
+    }
   }, [searchUrl]);
 
-  ///fired when there is a change in Provider name input text box
+  //fired when there is a change in Provider name input text box
   const onProvideChange = event => {
     SetProviderName(event.target.value.toUpperCase());
   };
 
-  ///fired when there is a change in city input text box
+  //fired when there is a change in city input text box
   const onCityChange = event => {
     SetCity(event.target.value.toUpperCase());
   };
 
-  ///fired when there the specialty dropdown value selected.
+  //fired when there the specialty dropdown value selected.
   const onSpecialtySelection = event => {
     const specialtyValue = event.target.value;
 
@@ -108,10 +144,9 @@ function SearchCritirea() {
     }
   };
 
-  ///fired when there the county dropdown value selected.
+  //fired when there the county dropdown value selected.
   const onCountySelection = event => {
     const contyValue = event.target.value;
-
     if (contyValue === "0") {
       SetCountySelected(initialCountyValue[0].value);
     } else {
@@ -120,36 +155,16 @@ function SearchCritirea() {
     }
   };
 
-  ///Fetch initial data to fill the drop down for specialty, county.
-  const fetchInitialData = async () => {
-    console.log("The value of PORT is-1:", process.env.REACT_APP_URL);
-    const url = process.env.REACT_APP_URL + "/GetInitialData";
-    console.log(url);
-    console.log("url");
-    try {
-      const result = await axios(
-        url
-        //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-
-        //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/GetInitialData"
-      );
-      SetSpecialtys(result.data.SpecialityList);
-      SetCounty(result.data.CountyList);
-    } catch (error) {
-      SetLoading(false);
-      SetErrorMessage(
-        "Error in Loading Specialty, County Information, Please contact Technical Support Team."
-      );
-    }
-  };
-
-  ///On SearchButton Click,
+  //On SearchButton Click,
   const onSearchBtnClick = event => {
     event.preventDefault();
     //no need to show the header text .
     SetVisibleHeaderText(false);
     //If there is error in initial loading then do not do any search.
-    if (errorMessage === initialErrorMessage) return;
+    if (errorMessage === initialErrorMessage) {
+      return;
+    }
+
     if (
       providerName.trim() === "" &&
       city.trim() === "" &&
@@ -157,28 +172,29 @@ function SearchCritirea() {
       specialtySelected === "0"
     ) {
       SetErrorMessage("Please Enter alteast one search Criteria.");
-      SetLoading(false);
+      SetVisibleSearchResult(false);
+      SetSearchUrl("");
     } else if (
       providerName.trim().length < 3 &&
       city.trim() === "" &&
       countySelected === "0" &&
       specialtySelected === "0"
     ) {
-      SetErrorMessage(initialErrorMessage);
-      SetLoading(false);
+      SetErrorMessage(
+        "Please enter minimum 3 characters of provider name or enter more search criteria"
+      );
+      SetVisibleSearchResult(false);
+      SetSearchUrl("");
     } else {
       SetErrorMessage("");
       fetchSearchData();
     }
   };
 
-  ///Set the SearchUrl
+  //Set the SearchUrl
   const fetchSearchData = async () => {
-    // let url =
-    //  "https://mod.alxix.slg.eds.com/AlportalaLT/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
-    let url = process.env.REACT_APP_URL+"/ProviderDirectorySearch?";
-    console.log(url);
-    //"http://localhost/Alportal/webservices/provider/ProviderDirectoryLocation.svc/ProviderDirectorySearch?";
+    let url = urlPath + "/ProviderDirectorySearch?";
+
     url = url + "provider=" + providerName.trim();
     url =
       specialtySelected === "0"
@@ -190,8 +206,8 @@ function SearchCritirea() {
         ? url + "&county="
         : url + "&county=" + countySelected;
     url = url + "&city=" + city.trim();
-
-    ///If no search criteria changed and on  click of search nothing has to be done.
+   
+    //If no search criteria changed and on  click of search nothing has to be done.
     if (url !== searchUrl) {
       SetSearchUrl(url);
 
@@ -203,9 +219,10 @@ function SearchCritirea() {
     }
   };
 
-  ///On Result Click.
+  //On Result Click.
   const onResetClick = event => {
     event.preventDefault();
+
     SetSearchUrl("");
     SetProviderName("");
     SetSpecialtySelected("0");
@@ -216,33 +233,23 @@ function SearchCritirea() {
     SetVisibleHeaderText(true);
   };
 
-  ///On Print button click
+  //On Print button click
   const printOrder = event => {
-    const printableElements = document.getElementById("printme").innerHTML;
-    const orderHtmlPage =
-      "<html><head><title></title></head><body>" +
-      printableElements +
-      "</body></html>";
-    const oldPage = document.body.innerHTML;
-    document.body.innerHTML = orderHtmlPage;
     window.print();
-    document.body.innerHTML = oldPage;
   };
 
   return (
     <React.Fragment>
       <form onSubmit={onSearchBtnClick}>
         <div className="container-fluid">
-          <div className="row">
-            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 ">
+          <div className="row" id="searchCriteria">
+            <div className="col-xs-1 col-sm-1 col-md-1 col-lg-2 ">
               {/* One */}
             </div>
-            <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
-              <div className="d-none d-md-block">
-                {visibleHeaderText ? <Header /> : null}
-              </div>
+            <div className="col-xs-10 col-sm-10 col-md-10 col-lg-8 ">
+              <div>{visibleHeaderText ? <Header /> : null}</div>
 
-              <div>
+              <div className="no-print">
                 <Ribbon
                   labelText="Enter Search Criteria"
                   controlType="titleBar"
@@ -308,7 +315,7 @@ function SearchCritirea() {
                       value={countySelected}
                       className="form-control "
                     >
-                      <option key="0" value="0" selected="true">
+                      <option key="0" value="0">
                         {"--- Select A County ---"}
                       </option>
                       {county.map((obj, index) => (
@@ -344,7 +351,7 @@ function SearchCritirea() {
                 <Ribbon labelText="&nbsp;" controlType="titleBar" />
               </div>
 
-              <div className="float-right p-2">
+              <div className="float-right p-2 no-print">
                 <Button
                   type="Submit"
                   className="btn btn-primary ml-3"
@@ -360,17 +367,22 @@ function SearchCritirea() {
                   Reset
                 </Button>{" "}
                 {visibleSearchResult ? (
-                  <Button
-                    type="Button"
-                    className="btn-primary ml-3"
-                    onClick={printOrder}
-                  >
-                    Print
-                  </Button>
+                  <React.Fragment>
+                    <Button
+                      type="Button"
+                      className="btn-primary ml-3 no-print"
+                      onClick={printOrder}
+                    >
+                      Print
+                    </Button>
+                  </React.Fragment>
                 ) : null}
               </div>
-
-              <div style={{ clear: "both" }}>
+              <div
+                className="no-print"
+                style={{ clear: "both" }}
+                id="SearchResultsContent"
+              >
                 {visibleSearchResult ? (
                   <SearchResults
                     id="sr1"
@@ -389,7 +401,6 @@ function SearchCritirea() {
               <div className="d-flex  justify-content-center align-items-center">
                 {loading ? <Loader type="ThreeDots" color="#1e6bd6" /> : ""}
               </div>
-
               <div className="d-none" id="printme">
                 <SearchResults
                   key="2"
@@ -399,7 +410,7 @@ function SearchCritirea() {
                 />
               </div>
             </div>
-            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+            <div className="col-xs-1 col-sm-1 col-md-1 col-lg-2">
               {/* Three */}
             </div>
           </div>
